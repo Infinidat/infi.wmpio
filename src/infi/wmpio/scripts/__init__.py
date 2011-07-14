@@ -63,8 +63,9 @@ def get_devices(client):
 
 def get_policies_for_devices(client, devices):
     query = client.query(LBPOLICY_QUERY)
-    for policy in query:
-        device = devices[policy.InstanceName]
+    for result in query:
+        policy = result.LoadBalancePolicy
+        device = devices[result.InstanceName]
         device.LoadBalancePolicy = policy.LoadBalancePolicy
         for dsm_path in policy.DSM_Paths:
             path = device.PdoInformation[dsm_path.DsmPathId]
