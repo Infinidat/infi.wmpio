@@ -95,7 +95,7 @@ def travel(argv=argv):
     start_time = clock()
 
     for index in range(int(count)):
-        methods[method]()
+        methods[int(method)]()
     duration = clock() - start_time
     print("iters=%d, iters/sec: %.2f" % (int(count), float(count) / duration))
 
