@@ -87,7 +87,7 @@ def wmi_find_classes():
 
 def win32com_client():
     from win32com.client import GetObject
-    client = GetObject(MPIO_WMI_NAMESPACE)
+    client = GetObject('winmgmts:%s' % MPIO_WMI_NAMESPACE)
     client.query = client.ExecQuery
     devices = get_devices(client)
     get_policies_for_devices(client, devices)
