@@ -85,6 +85,13 @@ def method_1(find_classes=False):
 def method_2():
     method_1(True)
 
+def method_3():
+    from win32com.client import GetObject
+    client = GetObject(MPIO_WMI_NAMESPACE)
+    client.query = client.ExecQuery
+    devices = get_devices(client)
+    get_policies_for_devices(client, devices)
+
 from sys import argv
 
 def travel(argv=argv):
