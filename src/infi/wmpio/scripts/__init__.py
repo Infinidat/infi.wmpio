@@ -10,6 +10,7 @@ class MpioGetDescriptorEntry(Bunch):
         self.DeviceName = None
         self.InstanceName = None
         self.NumberPdos = None
+
 def travel():
     from wmi import WMI
     client = WMI(namespace=MPIO_WMI_NAMESPACE, find_classes=False)
@@ -20,4 +21,4 @@ def travel():
         for attr in ['DeviceName', 'InstanceName', 'NumberPdos']:
             setattr(item, attr, getattr(device, attr))
         results.append(item)
-    print results
+    return results
