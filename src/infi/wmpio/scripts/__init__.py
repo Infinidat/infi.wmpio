@@ -44,8 +44,9 @@ class LoadBalancePolicy(Bunch):
         self.TargetPortGroup_Preferred = None
         self.TargetPortGroup_State = None
 
-def get_devices(client):
-    query = client.query(DEVICES_QUERY)
+def get_devices(client, query_func_name):
+    query_func = client.query if query_func_name == 'query' else 'ExecQuery'
+    query = query_func(DEVICES_QUERY)
     devices = {}
     for result in query:
         device = Device()
@@ -61,8 +62,9 @@ def get_devices(client):
         devices[device.InstanceName] = device
     return devices
 
-def get_policies_for_devices(client, devices):
-    query = client.query(LBPOLICY_QUERY)
+def get_policies_for_devices(client, devices, query_func_name):
+    query_func = client.query if query_func_name == 'query' else 'ExecQuery'
+    query = query_func(LBPOLICY_QUERY)
     for result in query:
         policy = result.LoadBalancePolicy
         device = devices[result.InstanceName]
@@ -79,8 +81,8 @@ def get_policies_for_devices(client, devices):
 def wmi_no_find_classes(find_classes=False):
     from wmi import WMI
     client = WMI(namespace=MPIO_WMI_NAMESPACE, find_classes=find_classes)
-    devices = get_devices(client)
-    get_policies_for_devices(client, devices)
+    devices = get_devices(client, 'query')
+    get_policies_for_devices(client, devices, 'query')
 
 def wmi_find_classes():
     wmi_no_find_classes(True)
@@ -88,9 +90,8 @@ def wmi_find_classes():
 def win32com_client():
     from win32com.client import GetObject
     client = GetObject('winmgmts:%s' % MPIO_WMI_NAMESPACE)
-    client.query = client.ExecQuery
-    devices = get_devices(client)
-    get_policies_for_devices(client, devices)
+    devices = get_devices(client, 'ExecQuery')
+    get_policies_for_devices(client, devices, 'ExecQuery')
 
 from sys import argv
 
