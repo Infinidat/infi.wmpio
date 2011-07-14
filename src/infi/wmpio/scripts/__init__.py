@@ -75,10 +75,27 @@ def get_policies_for_devices(client, devices):
                          'TargetPortGroup_Preferred', 'TargetPortGroup_State']:
                 setattr(path, attr, getattr(dsm_path, attr))
 
-def travel():
+
+def method_1(find_classes=False):
     from wmi import WMI
-    client = WMI(namespace=MPIO_WMI_NAMESPACE, find_classes=False)
+    client = WMI(namespace=MPIO_WMI_NAMESPACE, find_classes=find_classes)
     devices = get_devices(client)
     get_policies_for_devices(client, devices)
-    print devices
-    return devices
+
+def method_2():
+    method_1(True)
+
+from sys import argv
+
+def travel(argv=argv):
+    from time import clock
+    methods = {1: method_1,
+               2:method_2, }
+    method, count = argv[1:]
+    start_time = clock()
+
+    for index in range(int(count)):
+        methods[method]()
+    duration = clock() - start_time
+    print("iters=%d, iters/sec: %.2f" % (int(count), float(count) / duration))
+
