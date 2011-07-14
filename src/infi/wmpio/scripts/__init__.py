@@ -36,7 +36,7 @@ class LoadBalancePolicy(Bunch):
         self.FailedPath = None
         self.OptimizedPath = None
         self.PathWeight = None
-        self.PreferedPath = None
+        self.PreferredPath = None
         self.PrimaryPath = None
         self.SymmetricLUA = None
         self.TargetPort_Identifier = None
@@ -70,7 +70,7 @@ def get_policies_for_devices(client, devices):
         for dsm_path in policy.DSM_Paths:
             path = device.PdoInformation[dsm_path.DsmPathId]
             for attr in ['DsmPathId', 'FailedPath', 'OptimizedPath', 'PathWeight',
-                         'PreferedPath', 'PrimaryPath', 'SymmetricLUA',
+                         'PreferredPath', 'PrimaryPath', 'SymmetricLUA',
                          'TargetPort_Identifier', 'TargetPortGroup_Identifier',
                          'TargetPortGroup_Preferred', 'TargetPortGroup_State']:
                 setattr(path, attr, getattr(dsm_path, attr))
