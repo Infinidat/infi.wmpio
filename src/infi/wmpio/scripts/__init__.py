@@ -45,7 +45,7 @@ class LoadBalancePolicy(Bunch):
         self.TargetPortGroup_State = None
 
 def get_devices(client, query_func_name):
-    query_func = client.query if query_func_name == 'query' else 'ExecQuery'
+    query_func = client.query if query_func_name == 'query' else client.ExecQuery
     query = query_func(DEVICES_QUERY)
     devices = {}
     for result in query:
@@ -63,7 +63,7 @@ def get_devices(client, query_func_name):
     return devices
 
 def get_policies_for_devices(client, devices, query_func_name):
-    query_func = client.query if query_func_name == 'query' else 'ExecQuery'
+    query_func = client.query if query_func_name == 'query' else client.ExecQuery
     query = query_func(LBPOLICY_QUERY)
     for result in query:
         policy = result.LoadBalancePolicy
