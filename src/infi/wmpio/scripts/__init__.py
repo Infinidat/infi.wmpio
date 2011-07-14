@@ -78,14 +78,17 @@ def get_policies_for_devices(client, devices, query_func_name):
                 setattr(path, attr, getattr(dsm_path, attr))
 
 
-def wmi_no_find_classes(find_classes=False):
+def wmi_method(find_classes):
     from wmi import WMI
     client = WMI(namespace=MPIO_WMI_NAMESPACE, find_classes=find_classes)
     devices = get_devices(client, 'query')
     get_policies_for_devices(client, devices, 'query')
 
+def wmi_no_find_classes():
+    wmi_method(False)
+
 def wmi_find_classes():
-    wmi_no_find_classes(True)
+    wmi_method(True)
 
 def win32com_client():
     from win32com.client import GetObject
@@ -106,5 +109,6 @@ def travel(argv=argv):
     for index in range(int(count)):
         methods[int(method)]()
     duration = clock() - start_time
-    print("iters=%d, iters/sec: %.2f" % (int(count), float(count) / duration))
+    print("time=%.2f, iters=%d, iters/sec: %.2f" %
+          (duration, int(count), float(count) / duration))
 
