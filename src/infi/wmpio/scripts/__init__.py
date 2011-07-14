@@ -1,6 +1,7 @@
 
 MPIO_WMI_NAMESPACE = r'root\wmi'
 DEVICES_QUERY = 'SELECT * FROM MPIO_GET_DESCRIPTOR'
+LBPOLICY_QUERY = 'SELECT * FROM DSM_QueryLBPolicy_V2'
 
 from bunch import Bunch
 
@@ -45,7 +46,12 @@ def _travel_devices(client):
         results.append(descriptor)
     return results
 
+def _travel_policies(client):
+    query = client.query(LBPOLICY_QUERY)
+    return []
+
 def travel():
     from wmi import WMI
     client = WMI(namespace=MPIO_WMI_NAMESPACE, find_classes=False)
     devices = _travel_devices(client)
+    return devices
