@@ -17,7 +17,6 @@ class Path(Bunch):
     def __init__(self):
         super(Path, self).__init__()
         self.DeviceState = None
-        self.Identifier = None
         self.PathIdentifier = None
         self.ScsiAddress = ScsiAddress()
 
@@ -32,7 +31,6 @@ class ScsiAddress(Bunch):
 class LoadBalancePolicy(Bunch):
     def __init__(self):
         super(LoadBalancePolicy, self).__init__()
-        self.DsmPathId = None
         self.FailedPath = None
         self.OptimizedPath = None
         self.PathWeight = None
@@ -68,16 +66,17 @@ def get_devices(client):
     for device_index in xrange(query.Count):
         result = _get_index(query, device_index)
         device = Device()
-        for attr in ['DeviceName', 'InstanceName', 'NumberPdos']:
+        for attr in ['DeviceName', 'InstanceName']:
             setattr(device, attr, _wmi_getattr(result, attr))
         PdoInformation = _wmi_getattr(result, "PdoInformation") # GetBestInterface
         for pdo in PdoInformation:
             path = Path()
             ScsiAddress = _wmi_getattr(pdo, 'ScsiAddress') # GetBestInterface
-            for attr in ['DeviceState', 'Identifier', 'PathIdentifier']:
+            for attr in ['DeviceState', 'PathIdentifier']:
                 setattr(path, attr, _wmi_getattr(pdo, attr))
             for attr in ['Lun', 'PortNumber', 'ScsiPathId', 'TargetId']:
-                setattr(path.ScsiAddress, attr, _wmi_getattr(ScsiAddress, attr))
+                #setattr(path.ScsiAddress, attr, _wmi_getattr(ScsiAddress, attr))
+                pass
             device.PdoInformation[path.PathIdentifier] = path
         devices[device.InstanceName] = device
     return devices
@@ -91,11 +90,12 @@ def get_policies_for_devices(client, devices):
         device.LoadBalancePolicy = _wmi_getattr(policy, 'LoadBalancePolicy') # GetBestInterface
         for dsm_path in _wmi_getattr(policy, 'DSM_Paths'):
             path = device.PdoInformation[_wmi_getattr(dsm_path, 'DsmPathId')] # GetBestInterface
-            for attr in ['DsmPathId', 'FailedPath', 'OptimizedPath', 'PathWeight',
+            for attr in ['FailedPath', 'OptimizedPath', 'PathWeight',
                          'PreferredPath', 'PrimaryPath', 'SymmetricLUA',
                          'TargetPort_Identifier', 'TargetPortGroup_Identifier',
                          'TargetPortGroup_Preferred', 'TargetPortGroup_State']:
-                setattr(path, attr, _wmi_getattr(dsm_path, attr))
+                #setattr(path, attr, _wmi_getattr(dsm_path, attr))
+                pass
 
 def wmi_method(find_classes):
     from wmi import WMI
