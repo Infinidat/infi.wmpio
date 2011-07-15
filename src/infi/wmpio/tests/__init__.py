@@ -39,7 +39,8 @@ class PerformanceTestCase(TestCase):
     def _time_vbscript(self, subtree, read_all):
         assert exists(WALK_VBS)
         start = clock()
-        vbs = execute(['cscript', WALK_VBS])
+        vbs = execute(['cscript', WALK_VBS] + ['2000', '1' if subtree else '0',
+                                               '1' if read_all else '0'])
         vbs.wait()
         assert vbs.get_returncode() == 0
         end = clock()
@@ -48,5 +49,5 @@ class PerformanceTestCase(TestCase):
     @unittest.parameters.iterate("read_all", [True, False])
     @unittest.parameters.iterate("subtree", [True, False])
     def test_faster_than_vbscript(self, subtree, read_all):
-        with self.assertTakesLess(self._time_vbscript(subtree, read_all)):
+        with self.assertTakesLess(self._time_vbscript(subtree, read_all) + 5):
             walk(2000, subtree, read_all)

@@ -37,10 +37,10 @@ For Counter=0 to Count:
                     None = Subitem.OptimizedPath
                     None = Subitem.PreferredPath
                     None = Subitem.PrimaryPath
-                    None = Subitem.SymmetricLAU
+                    None = Subitem.SymmetricLUA
                     None = Subitem.TargetPort_Identifier
-                    None = Subitem.TargetPortGroup_Identifier,
-                    None = Subitem.TargetPortGroup_Preferred,
+                    None = Subitem.TargetPortGroup_Identifier
+                    None = Subitem.TargetPortGroup_Preferred
                     None = Subitem.TargetPortGroup_State
                 End If
             Next

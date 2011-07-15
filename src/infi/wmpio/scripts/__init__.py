@@ -15,7 +15,7 @@ def walk_on_devices(wmi_client, walk_on_paths, read_all_attributes):
             for pdo in v.PdoInformation:
                 if not read_all_attributes:
                     continue
-                _ = pdo.PathIdentifer, pdo.DeviceState,
+                _ = pdo.PathIdentifier, pdo.DeviceState,
                 _ = pdo.ScsiAddress.Lun, pdo.ScsiAddress.PortNumber, \
                     pdo.ScsiAddress.ScsiPathId, pdo.ScsiAddress.TargetId
         if not read_all_attributes:
@@ -33,6 +33,8 @@ def walk_on_policies(wmi_client, walk_on_paths, read_all_attributes):
                     path.PreferredPath, path.PrimaryPath, path.SymmetricLUA, \
                     path.TargetPort_Identifier, path.TargetPortGroup_Identifier, \
                     path.TargetPortGroup_Preferred, path.TargetPortGroup_State
+        if not read_all_attributes:
+            continue
         _ = v.InstanceName, v.LoadBalancePolicy
 
 def walk(count, subtree, read_all):
@@ -57,3 +59,4 @@ def profile(argv=argv):
     print filename
     run("from infi.wmpio.scripts import walk; walk(%s, %s, %s)" % \
         (int(count), int(subtree), int(read_all)), filename)
+

@@ -28,7 +28,8 @@ class WmiObject(object):
     def get_wmi_attribute(self, attr):
         return self._get_cached_value(attr)
 
-def get_comtypes_client(cls):
+def get_comtypes_client():
+    from .. import comtypes as _comtypes
     from comtypes import CoGetObject
     from comtypes.client import GetModule
     wmi_module = GetModule(['{565783C6-CB41-11D1-8B02-00600806D9B6}', 1 , 2 ])
@@ -49,6 +50,6 @@ class WmiClient(object):
 
     def execute_query(self, query):
         results = self._client.ExecQuery(query)
-        print results.Count
         for index in xrange(results.Count):
             yield self._get_item_by_index(results, index)
+

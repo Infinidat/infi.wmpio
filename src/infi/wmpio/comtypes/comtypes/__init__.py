@@ -832,7 +832,8 @@ class _compointer_base(c_void_p):
     def __del__(self, _debug=logger.debug):
         "Release the COM refcount we own."
         if self:
-            self.Release()
+            if not type(self)._com_shutting_down:
+                self.Release()
 
     def __cmp__(self, other):
         """Compare pointers to COM interfaces."""
