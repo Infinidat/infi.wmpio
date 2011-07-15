@@ -27,7 +27,7 @@ class ExeuctionTestCase(TestCase):
 
     @unittest.parameters.iterate("read_all", [True, False])
     @unittest.parameters.iterate("subtree", [True, False])
-    def test_walk(self, subtree, read_all):
+    def test_walk(self, read_all, subtree):
         walk(10, subtree, read_all)
 
 class PerformanceTestCase(TestCase):
