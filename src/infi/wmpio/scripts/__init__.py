@@ -62,6 +62,7 @@ def _get_index(results, index):
 
 def get_devices(client):
     query = _exec_query(client, DEVICES_QUERY)
+    return
     devices = {}
     for device_index in xrange(query.Count):
         result = _get_index(query, device_index)
@@ -83,6 +84,7 @@ def get_devices(client):
 
 def get_policies_for_devices(client, devices):
     query = _exec_query(client, LBPOLICY_QUERY)
+    return
     for index in xrange(query.Count):
         result = _get_index(query, index)
         policy = _wmi_getattr(result, 'LoadBalancePolicy')
@@ -136,11 +138,15 @@ def travel(argv=argv):
                4:comtypes_client}
     method, count = argv[1:]
     start_time = clock()
-
-    client = methods[int(method)]()
-    for index in range(int(count)):
-        devices = get_devices(client)
-        get_policies_for_devices(client, devices)
+    if int(method) == 5:
+        from subprocess import Popen, PIPE
+        vb = Popen(['cscript', 'mpio.vbs'], stdout=PIPE, stderr=PIPE)
+        vb.wait()
+    else:
+        client = methods[int(method)]()
+        for index in range(int(count)):
+            devices = get_devices(client)
+            get_policies_for_devices(client, devices)
     duration = clock() - start_time
     print("time=%.2f, iters=%d, iters/sec: %.2f" %
           (duration, int(count), float(count) / duration))
