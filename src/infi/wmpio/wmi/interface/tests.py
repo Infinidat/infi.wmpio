@@ -29,11 +29,11 @@ class MockClientTestCase(ClientTestCase):
         pass
 
     def test_client(self):
-        with nested(mock.patch("infi.wmpio.wmi.get_comtypes_client")) as (client,):
+        with nested(mock.patch("infi.wmpio.wmi.interface.get_comtypes_client")) as (client,):
             ClientTestCase.test_client(self)
 
     def test_execute_query(self):
-        with nested(mock.patch("infi.wmpio.wmi.get_comtypes_client")) as (client,):
+        with nested(mock.patch("infi.wmpio.wmi.interface.get_comtypes_client")) as (client,):
             class ResultSet(object):
                 Count = 3
                 def ItemIndex(self, index):
