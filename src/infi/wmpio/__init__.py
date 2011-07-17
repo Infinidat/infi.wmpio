@@ -11,3 +11,4 @@ With this module, you can:
 """
 
 from .wmi import WmiClient, get_mulitpath_devices, get_load_balace_policies
+from .mpclaim import MultipathClaim
