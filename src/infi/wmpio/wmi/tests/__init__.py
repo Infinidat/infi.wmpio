@@ -54,5 +54,6 @@ class PerformanceTestCase(TestCase):
     def test_faster_than_vbscript(self, subtree, read_all, count):
         logging.debug("running walk with count=%s, subtree=%s, read_all=%s",
                       count, subtree, read_all)
-        with self.assertTakesLess(self._time_vbscript(subtree, read_all) + 5):
+        vbscript_time = self._time_vbscript(subtree, read_all)
+        with self.assertTakesLess(vbscript_time*110/100):
             walk(count, subtree, read_all)

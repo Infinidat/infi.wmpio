@@ -1,6 +1,6 @@
 
 def is_windows_2008_r2():
-    return False
+    return False #pragma: no-cover
 
 class Windows2008R2Only(object):
     def __init__(self, func):
@@ -60,7 +60,7 @@ class MultipathClaim(object):
     @classmethod
     def unclaim_specific_hardware(cls, vendor_id, product_id):
         if not cls.is_hardware_claimed(vendor_id, product_id):
-            return
+            return #pragma: no-cover
         cls.execute(["-n", "-u", "-d",
                      '"%s"' % cls._get_hardware_id(vendor_id, product_id)])
 
@@ -142,7 +142,7 @@ class MultipathClaim(object):
             for attr in ["PreferredPath", "PathWeight"]:
                 paths[path.DsmPathId][attr] = getattr(path, attr)
         if policy in [CLEAR_POLICY, ROUND_ROBIN, LEAST_QUEUE_DEPTH, LEAST_BLOCKS]:
-            cls.execute(["-l", "-d", disk_number, policy])
+            cls.execute(["-l", "-d", str(disk_number), str(policy)])
         else:
             paths_parameters = ["%s %s %s %s" % (hex(key)[2:].zfill(16),
                                                  value["DeviceState"],

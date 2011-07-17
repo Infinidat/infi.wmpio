@@ -88,10 +88,12 @@ class MpclaimTestCase(unittest.TestCase):
         if is_output_empty:
             output = "\n".join(["", "No target-level default load balance policies have been set.", ""])
         else:
+            if policy is None:
+                raise unittest.SkipTest
             output = "\n".join(["",
                                 """"Target H/W Identifier   "   LB Policy                              """,
                                 """-------------------------------------------------------------------------------""",
-                                """"ABC     123             "   RR                                     """,
+                                """"ABC     123             "   %s                                     """ % policy,
                                 ""])
         if is_output_empty:
             self.assertEqual(MultipathClaim._extract_hardware_specific_load_balacing_policy(output, self.HARDWARE_ID),
@@ -119,11 +121,16 @@ class MpclaimTestCase(unittest.TestCase):
     @mock.patch("infi.wmpio.mpclaim.is_windows_2008_r2")
     @mock.patch.object(MultipathClaim, "execute")
     def test_get_hardware_specific_load_balancing_policy(self, execute, is_windows_2008_r2):
-        from . import CLEAR_POLICY
-        output = "\n".join(["", "No target-level default load balance policies have been set.", ""])
+        from . import ROUND_ROBIN
+        output = "\n".join(["",
+                            """"Target H/W Identifier   "   LB Policy                              """,
+                            """-------------------------------------------------------------------------------""",
+                            """"ABC     123             "   RR                                     """,
+                            ""])
         execute.return_value = output
-        self.assertEqual(MultipathClaim.get_default_load_balancing_policy(), CLEAR_POLICY)
-        self.assertEqual(" ".join(execute.call_args[0][0]), "-s -m")
+        args = (self.VENDOR_ID, self.PRODUCT_ID)
+        self.assertEqual(MultipathClaim.get_hardware_specific_load_balacing_poicy(*args), ROUND_ROBIN)
+        self.assertEqual(" ".join(execute.call_args[0][0]), "-s -t")
 
     @mock.patch("infi.wmpio.mpclaim.is_windows_2008_r2")
     @mock.patch.object(MultipathClaim, "execute")
@@ -163,6 +170,17 @@ class MpclaimTestCase(unittest.TestCase):
     def test_set_device_specific_load_balancing_policy__simple(self, execute, is_windows_2008_r2):
         from . import ROUND_ROBIN
         device, policy = self._get_sample_device_and_policy()
+        policy.LoadBalancePolicy = ROUND_ROBIN
+        MultipathClaim.set_device_specific_load_balancing_policy(device, policy)
+        call_args = execute.call_args[0][0]
+        self.assertEqual(" ".join(call_args),
+                         "-l -d 123 2")
+
+    @mock.patch("infi.wmpio.mpclaim.is_windows_2008_r2")
+    @mock.patch.object(MultipathClaim, "execute")
+    def test_set_device_specific_load_balancing_policy__complex(self, execute, is_windows_2008_r2):
+        from . import ROUND_ROBIN
+        device, policy = self._get_sample_device_and_policy()
         MultipathClaim.set_device_specific_load_balancing_policy(device, policy)
         call_args = execute.call_args[0][0]
         self.assertEqual(" ".join(call_args),
@@ -176,3 +194,9 @@ class MpclaimTestCase(unittest.TestCase):
         LocalComputer.return_value.local_machine = \
             {"SYSTEM\\CurrentControlSet\\Control\\MPDEV":mock}
         MultipathClaim.get_claimed_hardware()
+
+    @mock.patch("infi.wmpio.mpclaim.is_windows_2008_r2")
+    def test_windows_2008_r2_command_on_other_version(self, is_windows_2008_r2):
+        is_windows_2008_r2.return_value = False
+        self.assertRaises(NotImplementedError, MultipathClaim.get_default_load_balancing_policy)
+
