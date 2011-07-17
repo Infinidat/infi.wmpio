@@ -28,8 +28,8 @@ class WmiObject(object):
 
 def get_comtypes_client():
     from . import comtypes as _comtypes
-    from comtypes import CoGetObject
-    from comtypes.client import GetModule
+    from comtypes.comtypes import CoGetObject
+    from comtypes.comtypes.client import GetModule
     wmi_module = GetModule(['{565783C6-CB41-11D1-8B02-00600806D9B6}', 1 , 2 ])
     client = CoGetObject(r"winmgmts:root\wmi", interface=wmi_module.ISWbemServicesEx)
     return client

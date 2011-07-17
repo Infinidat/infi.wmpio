@@ -13,7 +13,7 @@ class MpclaimTestCase(unittest.TestCase):
     def test_path(self):
         from os.path import join, sep
         self.assertEqual(MultipathClaim.path(),
-                         join(join("C:", "Windows"), "System32", "mpclaim.exe"))
+                         join(join("C:", sep, "Windows"), "System32", "mpclaim.exe"))
 
     @mock.patch("infi.execute.execute")
     def test_execute__ok(self, execute):

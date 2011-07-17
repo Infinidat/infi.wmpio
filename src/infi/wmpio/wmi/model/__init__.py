@@ -51,8 +51,8 @@ class PdoInformation(WmiObject):
     @property
     def ScsiAddress(self):
         if self._ScsiAddress is None:
-            self.ScsiAddress = ScsiAddress(self.get_wmi_attribute("ScsiAddress"))
-        return self.ScsiAddress
+            self._ScsiAddress = ScsiAddress(self.get_wmi_attribute("ScsiAddress"))
+        return self._ScsiAddress
 
 class ScsiAddress(WmiObject):
     @property

@@ -24,7 +24,7 @@ class MultipathClaim(object):
     def path(cls):
         from os.path import sep, join, exists
         from os import environ
-        return join(environ.get("SystemRoot", join("C:", "Windows")), "System32", "mpclaim.exe")
+        return join(environ.get("SystemRoot", join("C:", sep, "Windows")), "System32", "mpclaim.exe")
 
     @classmethod
     def execute(cls, commandline_arguments):
