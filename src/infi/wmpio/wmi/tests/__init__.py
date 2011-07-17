@@ -48,11 +48,11 @@ class PerformanceTestCase(TestCase):
         end = clock()
         return end - start
 
-    @unittest.parameters.iterate("walk", [100, 500, 1000])
+    @unittest.parameters.iterate("count", [100, 500, 1000])
     @unittest.parameters.iterate("read_all", [True, False])
     @unittest.parameters.iterate("subtree", [True, False])
-    def test_faster_than_vbscript(self, subtree, read_all, walk):
-        logging.debug("running walk with walk=%s, subtree=%s, read_all=%s",
-                      walk, subtree, read_all)
+    def test_faster_than_vbscript(self, subtree, read_all, count):
+        logging.debug("running walk with count=%s, subtree=%s, read_all=%s",
+                      count, subtree, read_all)
         with self.assertTakesLess(self._time_vbscript(subtree, read_all) + 5):
-            walk(walk, subtree, read_all)
+            walk(count, subtree, read_all)
