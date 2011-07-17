@@ -13,11 +13,11 @@ class Device(WmiObject):
 
     @property
     def DeviceName(self):
-        return self.get_wmi_property("DeviceName")
+        return self.get_wmi_attribute("DeviceName")
 
     @property
     def InstanceName(self):
-        return self.get_wmi_property("InstanceName")
+        return self.get_wmi_attribute("InstanceName")
 
     @property
     def PdoInformation(self):
@@ -25,7 +25,7 @@ class Device(WmiObject):
             for path in self._PdoInformation:
                 yield path
         else:
-            items = self.get_wmi_property("PdoInformation")
+            items = self.get_wmi_attribute("PdoInformation")
             for item in items:
                 path = PdoInformation(item)
                 self._PdoInformation.append(path)
@@ -38,38 +38,42 @@ class PdoInformation(WmiObject):
 
     @property
     def DeviceState(self):
-        return self.get_wmi_property("DeviceState")
+        return self.get_wmi_attribute("DeviceState")
+
+    @DeviceState.setter
+    def DeviceState(self, value):
+        self._values["DeviceState"] = value
 
     @property
     def PathIdentifier(self):
-        return self.get_wmi_property("PathIdentifier")
+        return self.get_wmi_attribute("PathIdentifier")
 
     @property
     def ScsiAddress(self):
         if self._ScsiAddress is None:
-            self.ScsiAddress = ScsiAddress(self.get_wmi_property("ScsiAddress"))
+            self.ScsiAddress = ScsiAddress(self.get_wmi_attribute("ScsiAddress"))
         return self.ScsiAddress
 
 class ScsiAddress(WmiObject):
     @property
     def Lun(self):
-        return self.get_wmi_property("Lun")
+        return self.get_wmi_attribute("Lun")
 
     @property
     def PortNumber(self):
-        return self.get_wmi_property("PortNumber")
+        return self.get_wmi_attribute("PortNumber")
 
     @property
     def ScsiPathId(self):
-        return self.get_wmi_property("ScsiPathId")
+        return self.get_wmi_attribute("ScsiPathId")
 
     @property
     def TargetId(self):
-        return self.get_wmi_property("TargetId")
+        return self.get_wmi_attribute("TargetId")
 
 class LoadBalancePolicy(WmiObject):
     def __init__(self, com_object, instance_name):
-        super(Device, self).__init__(com_object)
+        super(LoadBalancePolicy, self).__init__(com_object)
         self._DSM_Paths = []
         self.InstanceName = instance_name
 
@@ -79,53 +83,69 @@ class LoadBalancePolicy(WmiObject):
             for path in self._DSM_Paths:
                 yield path
         else:
-            items = self.get_wmi_property("DSM_Paths")
+            items = self.get_wmi_attribute("DSM_Paths")
             for item in items:
                 path = DSM_Path(item)
                 self._DSM_Paths.append(path)
                 yield path
 
+    @property
+    def LoadBalancePolicy(self):
+        return self.get_wmi_attribute("LoadBalancePolicy")
+
+    @LoadBalancePolicy.setter
+    def LoadBalancePolicy(self, value):
+        self._values["LoadBalancePolicy"] = value
+
 class DSM_Path(WmiObject):
     @property
     def DsmPathId(self):
-        return self.get_wmi_property("DsmPathId")
+        return self.get_wmi_attribute("DsmPathId")
 
     @property
     def FailedPath(self):
-        return self.get_wmi_property("FailedPath")
+        return self.get_wmi_attribute("FailedPath")
 
     @property
     def OptimizedPath(self):
-        return self.get_wmi_property("OptimizedPath")
+        return self.get_wmi_attribute("OptimizedPath")
 
     @property
     def PathWeight(self):
-        return self.get_wmi_property("PathWeight")
+        return self.get_wmi_attribute("PathWeight")
+
+    @PathWeight.setter
+    def PathWeight(self, value):
+        self._values["PathWeight"] = value
 
     @property
     def PreferredPath(self):
-        return self.get_wmi_property("PreferredPath")
+        return self.get_wmi_attribute("PreferredPath")
+
+    @PreferredPath.setter
+    def PreferredPath(self, value):
+        self._values["PreferredPath"] = value
 
     @property
     def PrimaryPath(self):
-        return self.get_wmi_property("PrimaryPath")
+        return self.get_wmi_attribute("PrimaryPath")
 
     @property
     def SymmetricLUA(self):
-        return self.get_wmi_property("SymmetricLUA")
+        return self.get_wmi_attribute("SymmetricLUA")
 
     @property
     def TargetPort_Identifier(self):
-        return self.get_wmi_property("TargetPort_Identifier")
+        return self.get_wmi_attribute("TargetPort_Identifier")
 
     @property
     def TargetPortGroup_Identifier(self):
-        return self.get_wmi_property("TargetPortGroup_Identifier")
+        return self.get_wmi_attribute("TargetPortGroup_Identifier")
 
     @property
     def TargetPortGroup_Preferred(self):
-        return self.get_wmi_property("TargetPortGroup_Preferred")
+        return self.get_wmi_attribute("TargetPortGroup_Preferred")
 
     @property
     def TargetPortGroup_State(self):
-        return self.get_wmi_property("TargetPortGroup_State")
+        return self.get_wmi_attribute("TargetPortGroup_State")
