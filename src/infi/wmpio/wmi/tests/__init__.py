@@ -7,6 +7,8 @@ from infi.execute import execute
 from os.path import abspath, dirname, exists, join
 
 import mock
+import logging
+
 from infi.wmpio.wmi import WmiClient
 
 WALK_VBS = abspath(join(dirname(__file__), 'walk.vbs'))
@@ -46,8 +48,11 @@ class PerformanceTestCase(TestCase):
         end = clock()
         return end - start
 
+    @unittest.parameters.iterate("walk", [100, 500, 1000])
     @unittest.parameters.iterate("read_all", [True, False])
     @unittest.parameters.iterate("subtree", [True, False])
-    def test_faster_than_vbscript(self, subtree, read_all):
+    def test_faster_than_vbscript(self, subtree, read_all, walk):
+        logging.debug("running walk with walk=%s, subtree=%s, read_all=%s",
+                      walk, subtree, read_all)
         with self.assertTakesLess(self._time_vbscript(subtree, read_all) + 5):
-            walk(2000, subtree, read_all)
+            walk(walk, subtree, read_all)
