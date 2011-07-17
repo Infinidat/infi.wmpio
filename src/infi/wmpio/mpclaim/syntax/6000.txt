@@ -1,0 +1,20 @@
+
+Installs MPIO OC and then ensures MSDSM claims passed in device.
+
+Usage: mpclaim  reboot_option  install_switch  device_switch  device_hwid(s)
+
+ reboot_option  Whether to automatically reboot or not
+       -r       automatically reboot without prompting
+       -n       suppress reboot request (CALLER IS EXPECTED TO REBOOT)
+ install_switch Whether to multipath or remove MPIO support
+       -i       install MPIO OC and add multipath support for device
+       -u       remove multipath support for device and uninstall MPIO
+                  OC if no remaning devices are multipath'd
+ device_switch  Whether to apply above options to all devices or passed-in devices
+       -d       following parameters indicate hardware ids of devices
+       -a       work on all applicable devices
+       -c       work on only all SPC3-compliant devices (meaningful only in the
+                  context of install. If used with '-u', it is treated as '-a')
+ device_hwid    HardwareIDs of Devices to be MPIO'd, as strings of vendor8product16,
+                  delimited by a space (Note: Use empty string with '-a' option)
+

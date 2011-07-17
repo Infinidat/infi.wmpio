@@ -1,7 +1,7 @@
 
 from contextlib import contextmanager, nested
 from time import clock
-from ..scripts import walk
+from ...scripts import walk
 from infi import unittest
 from infi.execute import execute
 from os.path import abspath, dirname, exists, join

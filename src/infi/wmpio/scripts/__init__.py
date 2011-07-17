@@ -2,15 +2,10 @@ __import__("pkg_resources").declare_namespace(__name__)
 
 from sys import argv
 from .. import get_mulitpath_devices, get_load_balace_policies, WmiClient
-from .. import DEVICES_QUERY, LBPOLICY_QUERY
-
-def issue_queries(wmi_client):
-    wmi_client.execute_query(DEVICES_QUERY)
-    wmi_client.execute_query(LBPOLICY_QUERY)
 
 def walk_on_devices(wmi_client, walk_on_paths, read_all_attributes):
     devices = get_mulitpath_devices(wmi_client)
-    for k, v in devices.items():
+    for _, v in devices.items():
         if walk_on_paths:
             for pdo in v.PdoInformation:
                 if not read_all_attributes:
@@ -24,7 +19,7 @@ def walk_on_devices(wmi_client, walk_on_paths, read_all_attributes):
 
 def walk_on_policies(wmi_client, walk_on_paths, read_all_attributes):
     policies = get_load_balace_policies(wmi_client)
-    for k, v in policies.items():
+    for _, v in policies.items():
         if walk_on_paths:
             for path in v.DSM_Paths:
                 if not read_all_attributes:
@@ -39,7 +34,7 @@ def walk_on_policies(wmi_client, walk_on_paths, read_all_attributes):
 
 def walk(count, subtree, read_all):
     wmi_client = WmiClient()
-    for counter in xrange(int(count)):
+    for _ in xrange(int(count)):
         walk_on_devices(wmi_client, subtree, read_all)
         walk_on_policies(wmi_client, subtree, read_all)
 
@@ -59,4 +54,3 @@ def profile(argv=argv):
     print filename
     run("from infi.wmpio.scripts import walk; walk(%s, %s, %s)" % \
         (int(count), int(subtree), int(read_all)), filename)
-

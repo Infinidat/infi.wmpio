@@ -1,55 +1,25 @@
 __import__("pkg_resources").declare_namespace(__name__)
 
-from contextlib import contextmanager
+from .interface import WmiClient, WmiObject
+from .model import Device, LoadBalancePolicy, DEVICES_QUERY, LBPOLICY_QUERY
 
-class WmiObject(object):
-    def __init__(self, com_object):
-        self._properties = None
-        self._values = dict()
-        self._object = com_object
+def get_mulitpath_devices(wmi_client):
+    """ returns a dictionary of (Device.InstanceName, Device) items
+    """
+    devices = dict()
+    for result in wmi_client.execute_query(DEVICES_QUERY):
+        device = Device(result)
+    devices[device.InstanceName] = device
+    return devices
 
-    def _get_properties(self):
-        return self._object.Properties_
-
-    @property
-    def properties(self):
-        if self._properties is None:
-            self._properties = self._get_properties()
-        return self._properties
-
-    def _get_property(self, attr):
-        return self.properties.Item(attr)
-
-    def _get_cached_value(self, attr):
-        if not self._values.has_key(attr):
-            self._values[attr] = self._get_property(attr).Value
-        return self._values[attr]
-
-    def get_wmi_attribute(self, attr):
-        return self._get_cached_value(attr)
-
-def get_comtypes_client():
-    from .. import comtypes as _comtypes
-    from comtypes import CoGetObject
-    from comtypes.client import GetModule
-    wmi_module = GetModule(['{565783C6-CB41-11D1-8B02-00600806D9B6}', 1 , 2 ])
-    client = CoGetObject(r"winmgmts:root\wmi", interface=wmi_module.ISWbemServicesEx)
-    return client
-
-class WmiClient(object):
-    def __init__(self):
-        super(WmiClient, self).__init__()
-        self._reload_client()
-
-    def _reload_client(self):
-        self._client = get_comtypes_client()
-
-    @classmethod
-    def _get_item_by_index(cls, results, index):
-        return results.ItemIndex(index)
-
-    def execute_query(self, query):
-        results = self._client.ExecQuery(query)
-        for index in xrange(results.Count):
-            yield self._get_item_by_index(results, index)
+def get_load_balace_policies(wmi_client):
+    """ returns a dictionary of (LoadBalanePolicy.InstanceName, LoadBalancePolicy)
+    items """
+    policies = dict()
+    for result in wmi_client.execute_query(LBPOLICY_QUERY):
+        wmi_object = WmiObject(result)
+        instance_name = wmi_object.get_wmi_attribute("InstanceName")
+        policies[instance_name] = LoadBalancePolicy(wmi_object.get_wmi_attribute("LoadBalancePolicy"),
+                                                    instance_name)
+    return policies
 
