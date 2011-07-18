@@ -1,10 +1,10 @@
 __import__("pkg_resources").declare_namespace(__name__)
 
 from sys import argv
-from .. import get_mulitpath_devices, get_load_balace_policies, WmiClient
+from .. import get_multipath_devices, get_load_balace_policies, WmiClient
 
 def walk_on_devices(wmi_client, walk_on_paths, read_all_attributes):
-    devices = get_mulitpath_devices(wmi_client)
+    devices = get_multipath_devices(wmi_client)
     for _, v in devices.items():
         if walk_on_paths:
             for pdo in v.PdoInformation:

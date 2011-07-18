@@ -214,9 +214,9 @@ class MpclaimTestCase(unittest.TestCase):
         from . import is_windows_2008_r2
         if name != "nt" or not is_windows_2008_r2():
             raise unittest.SkipTest
-        from ..wmi import WmiClient, get_mulitpath_devices, get_load_balace_policies
+        from ..wmi import WmiClient, get_multipath_devices, get_load_balace_policies
         client = WmiClient()
-        devices = get_mulitpath_devices(client)
+        devices = get_multipath_devices(client)
         policies = get_load_balace_policies(client)
         key = devices.keys()[1]
         device, policy = devices[key], policies[key]

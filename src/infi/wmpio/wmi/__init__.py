@@ -3,7 +3,7 @@ __import__("pkg_resources").declare_namespace(__name__)
 from .interface import WmiClient, WmiObject
 from .model import Device, LoadBalancePolicy, DEVICES_QUERY, LBPOLICY_QUERY
 
-def get_mulitpath_devices(wmi_client):
+def get_multipath_devices(wmi_client):
     """ returns a dictionary of (Device.InstanceName, Device) items
     """
     devices = dict()
