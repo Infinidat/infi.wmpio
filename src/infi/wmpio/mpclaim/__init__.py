@@ -1,6 +1,11 @@
 
 def is_windows_2008_r2():
-    return False #pragma: no-cover
+    if MultipathClaim._windows_2008_r2:
+        from infi.registry import LocalComputer
+        key = LocalComputer().local_machine[r"SOFTWARE\Microsoft\Windows NT\CurrentVersion"]
+        value = key.values_store["CurrentVersion"]
+        MultipathClaim._windows_2008_r2 = value == "6.1"
+    return MultipathClaim._windows_2008_r2
 
 class Windows2008R2Only(object):
     def __init__(self, func):
@@ -20,14 +25,25 @@ WEIGHTED_PATHS = 5
 LEAST_BLOCKS = 6
 
 class MultipathClaim(object):
+    """ wrapper to the mpclaim.exe utility
+    This class only wraps functiontonality that we cannot retreive programatically through WMI
+    """
+
+    _windows_2008_r2 = None
+
     @classmethod
     def path(cls):
+        """ returns the path of mpclaim.exe
+        """
         from os.path import sep, join, exists
         from os import environ
         return join(environ.get("SystemRoot", join("C:", sep, "Windows")), "System32", "mpclaim.exe")
 
     @classmethod
     def execute(cls, commandline_arguments):
+        """ executes mpclaim.exe with the command-line arguments.
+        if mpclaim's return value is non-zero, a RuntimeError exception is raised with stderr
+        """
         from infi.execute import execute
         arguments = [cls.path()]
         arguments.extend(commandline_arguments)
@@ -39,18 +55,27 @@ class MultipathClaim(object):
 
     @classmethod
     def _get_hardware_id(cls, vendor_id, product_id):
+        """ returns the concatination of vendor_id and product_id, both justed
+        """
         return "%s%s" % (vendor_id.ljust(8), product_id.ljust(16))
 
     @classmethod
     def claim_specific_hardware(cls, vendor_id, product_id):
+        """ tells mpio to claim a specific hardware
+        """
         cls.execute(["-n", "-i", "-d", '"%s"' % cls._get_hardware_id(vendor_id, product_id)])
 
     @classmethod
     def claim_discovered_hardware(cls, spc3_only=False):
+        """ tells mpio to claim disks of all attached hardware types
+        if spc3_only is True, it has claim only disks that are spc3-complaint
+        """
         cls.execute(["-n", "-i", "-c" if spc3_only else "-a", '" "'])
 
     @classmethod
     def is_hardware_claimed(cls, vendor_id, product_id):
+        """ returns True if the specific hardware is claimed by mpio
+        """
         return dict(vendor_id=vendor_id, product_id=product_id) in cls.get_claimed_hardware()
 
     @classmethod
@@ -66,6 +91,8 @@ class MultipathClaim(object):
 
     @classmethod
     def get_claimed_hardware(cls):
+        """ returns a list of two-key dictionaries: vendor_id, hardware_id, of stuff claimed by mpio
+        """
         from infi.registry import LocalComputer
         from infi.registry.constants import KEY_READ, KEY_ENUMERATE_SUB_KEYS, KEY_QUERY_VALUE
 
@@ -109,17 +136,24 @@ class MultipathClaim(object):
     @classmethod
     @Windows2008R2Only
     def get_default_load_balancing_policy(cls):
+        """ returns MSDSM's default load balancing policy
+        """
         output = cls.execute(["-s", "-m"])
         return cls._extract_load_balancing_from_output(output)
 
     @classmethod
     @Windows2008R2Only
     def set_default_load_balancing_policy(cls, policy):
+        """ sets MSDSM's default load balancing policy
+        """
         cls.execute(["-l", "-m", str(policy)])
 
     @classmethod
     @Windows2008R2Only
     def get_hardware_specific_load_balacing_poicy(cls, vendor_id, product_id):
+        """ gets MSDSM's explicit load balancing policy for a given hardware type
+        if no such policy exists, CLEAR_POLICY is returns, and NOT the global-wise policy
+        """
         output = cls.execute(["-s", "-t"])
         hardware_id = cls._get_hardware_id(vendor_id, product_id)
         return cls._extract_hardware_specific_load_balacing_policy(output, hardware_id)
@@ -127,11 +161,21 @@ class MultipathClaim(object):
     @classmethod
     @Windows2008R2Only
     def set_hardware_specific_load_balancing_policy(cls, vendor_id, product_id, policy):
+        """ sets a load balancing policy explicitly for a given hardware type
+        """
         cls.execute(["-l", "-t", cls._get_hardware_id(vendor_id, product_id), str(policy)])
 
     @classmethod
     @Windows2008R2Only
     def set_device_specific_load_balancing_policy(cls, device, load_balance_policy):
+        """ sets an explicit load balancing policy for a given device
+        this method accepts a Device and LoadBalancePolicy objects, and sets
+        whatever policy and states that are defined in these objects.
+        
+        The LoadBalancePolicy attribute is taken from LoadBalancePolicy.LoadBalancePolicy
+        The DeviceState attribute is taked for the paths in Device.PdoInformation
+        The PreferredPath and PathWeight attribures are taken for the paths in LoadBalancePolicy.Dsm_Paths
+        """
         assert device.InstanceName == load_balance_policy.InstanceName
         disk_number = device.DeviceName.split("MPIODisk")[-1]
         policy = load_balance_policy.LoadBalancePolicy

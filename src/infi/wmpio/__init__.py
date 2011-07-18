@@ -7,7 +7,6 @@ With this module, you can:
 * get information about the connected MPIO devices
 * query/add/remove the "Multipath I/O" feature
 * query/add/remove claiming rules for the MSDSM
-
 """
 
 from .wmi import WmiClient, get_mulitpath_devices, get_load_balace_policies
