@@ -39,19 +39,19 @@ class MpclaimTestCase(unittest.TestCase):
     def test_claim_specific_hardware(self, execute):
         MultipathClaim.claim_specific_hardware(self.VENDOR_ID, self.PRODUCT_ID)
         self.assertEqual(' '.join(execute.call_args[0][0]),
-                         "-n -i -d \"%s\"" % self.HARDWARE_ID)
+                         "-n -i -d %s" % self.HARDWARE_ID)
 
     @mock.patch.object(MultipathClaim, "execute")
     def test_claim_all(self, execute):
         MultipathClaim.claim_discovered_hardware(False)
         self.assertEqual(' '.join(execute.call_args[0][0]),
-                         "-n -i %s \" \"" % "-a")
+                         "-n -i %s  " % "-a")
 
     @mock.patch.object(MultipathClaim, "execute")
     def test_claim_all__spc3_only(self, execute):
         MultipathClaim.claim_discovered_hardware(True)
         self.assertEqual(' '.join(execute.call_args[0][0]),
-                         "-n -i %s \" \"" % "-c")
+                         "-n -i %s  " % "-c")
 
     @mock.patch("infi.wmpio.mpclaim.MultipathClaim.get_claimed_hardware")
     def test_is_hardware_claimed(self, get_claimed_hardware):
@@ -64,7 +64,7 @@ class MpclaimTestCase(unittest.TestCase):
     def test_unclaim_all_hardware(self, execute):
         MultipathClaim.unclaim_all_hardware()
         self.assertEqual(' '.join(execute.call_args[0][0]),
-                         "-n -u -a \" \"")
+                         "-n -u -a  ")
 
     @mock.patch.object(MultipathClaim, "execute")
     @mock.patch.object(MultipathClaim, "is_hardware_claimed")
@@ -72,7 +72,7 @@ class MpclaimTestCase(unittest.TestCase):
         is_hardware_claimed.return_value = True
         MultipathClaim.unclaim_specific_hardware(self.VENDOR_ID, self.PRODUCT_ID)
         self.assertEqual(' '.join(execute.call_args[0][0]),
-                         "-n -u -d \"%s\"" % self.HARDWARE_ID)
+                         "-n -u -d %s" % self.HARDWARE_ID)
 
     @unittest.parameters.iterate("policy", [None, "Fail Over Only", "Round Robin",
                                             "Least Queue Depth", "Least Blocks"])
@@ -237,7 +237,6 @@ class MpclaimTestCase(unittest.TestCase):
         from os import name
         if name != "nt":
             raise unittest.SkipTest
-        self.assertFalse(MultipathClaim.is_hardware_claimed("A", "B"))
         MultipathClaim.claim_specific_hardware("A", "B")
         self.assertTrue(MultipathClaim.is_hardware_claimed("A", "B"))
 

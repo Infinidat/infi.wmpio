@@ -69,14 +69,14 @@ class MultipathClaim(object):
     def claim_specific_hardware(cls, vendor_id, product_id):
         """ tells mpio to claim a specific hardware
         """
-        cls.execute(["-n", "-i", "-d", '"%s"' % cls._get_hardware_id(vendor_id, product_id)])
+        cls.execute(["-n", "-i", "-d", '%s' % cls._get_hardware_id(vendor_id, product_id)])
 
     @classmethod
     def claim_discovered_hardware(cls, spc3_only=False):
         """ tells mpio to claim disks of all attached hardware types
         if spc3_only is True, it has claim only disks that are spc3-complaint
         """
-        cls.execute(["-n", "-i", "-c" if spc3_only else "-a", '" "'])
+        cls.execute(["-n", "-i", "-c" if spc3_only else "-a", ' '])
 
     @classmethod
     def is_hardware_claimed(cls, vendor_id, product_id):
@@ -86,14 +86,14 @@ class MultipathClaim(object):
 
     @classmethod
     def unclaim_all_hardware(cls):
-        cls.execute(["-n", "-u", "-a", '" "'])
+        cls.execute(["-n", "-u", "-a", ' '])
 
     @classmethod
     def unclaim_specific_hardware(cls, vendor_id, product_id):
         if not cls.is_hardware_claimed(vendor_id, product_id):
             return #pragma: no-cover
         cls.execute(["-n", "-u", "-d",
-                     '"%s"' % cls._get_hardware_id(vendor_id, product_id)])
+                     '%s' % cls._get_hardware_id(vendor_id, product_id)])
 
     @classmethod
     def get_claimed_hardware(cls):
