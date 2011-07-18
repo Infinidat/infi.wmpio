@@ -201,6 +201,3 @@ class MultipathClaim(object):
                                          str(value["PathWeight"]),
                                          str(value["PreferredPath"])])
             cls.execute(["-l", "-d", str(disk_number), str(policy)] + paths_parameters)
-
-
-# TODO add real-life tests for policies
