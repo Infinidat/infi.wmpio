@@ -192,7 +192,11 @@ class MpclaimTestCase(unittest.TestCase):
     @mock.patch("infi.registry.LocalComputer")
     def test_get_claimed_hardware(self, LocalComputer):
         class Mock(object):
-            values_store = dict(MPIOSupportedDeviceList=[self.HARDWARE_ID])
+            class SubMock(object):
+                @classmethod
+                def to_python_object(cls):
+                    return [self.HARDWARE_ID]
+            values_store = dict(MPIOSupportedDeviceList=SubMock())
         mock = Mock()
         LocalComputer.return_value.local_machine = \
             {"SYSTEM\\CurrentControlSet\\Control\\MPDEV":mock}
@@ -228,3 +232,12 @@ class MpclaimTestCase(unittest.TestCase):
             for path in policy.DSM_Paths:
                 path.PathWeight = 1
         MultipathClaim.set_device_specific_load_balancing_policy(device, policy)
+
+    def test_real_add_claim_rule(self):
+        from os import name
+        if name != "nt":
+            raise unittest.SkipTest
+        self.assertFalse(MultipathClaim.is_hardware_claimed("A", "B"))
+        MultipathClaim.claim_specific_hardware("A", "B")
+        self.assertTrue(MultipathClaim.is_hardware_claimed("A", "B"))
+

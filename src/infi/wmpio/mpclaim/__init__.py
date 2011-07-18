@@ -104,7 +104,7 @@ class MultipathClaim(object):
 
         registry = LocalComputer(KEY_READ | KEY_ENUMERATE_SUB_KEYS | KEY_QUERY_VALUE)
         mpdev = registry.local_machine[r'SYSTEM\CurrentControlSet\Control\MPDEV']
-        devices_list = mpdev.values_store['MPIOSupportedDeviceList']
+        devices_list = mpdev.values_store['MPIOSupportedDeviceList'].to_python_object()
         return [dict(vendor_id=device[:8].strip(), product_id=device[8:].strip()) for device in devices_list]
 
     @classmethod
