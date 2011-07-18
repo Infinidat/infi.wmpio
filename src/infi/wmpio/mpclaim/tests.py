@@ -228,7 +228,3 @@ class MpclaimTestCase(unittest.TestCase):
             for path in policy.DSM_Paths:
                 path.PathWeight = 1
         MultipathClaim.set_device_specific_load_balancing_policy(device, policy)
-
-from . import CLEAR_POLICY, FAIL_OVER_ONLY, ROUND_ROBIN, ROUND_ROBIN_WITH_SUBSET
-from . import LEAST_QUEUE_DEPTH, WEIGHTED_PATHS, LEAST_BLOCKS
-from . import ACTIVE_OPTIMIZED, ACTIVE_NON_OPTIMIZED, STANDBY, UNAVAILABLE
