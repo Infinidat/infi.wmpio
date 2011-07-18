@@ -1,10 +1,8 @@
 
 def is_windows_2008_r2():
     if MultipathClaim._windows_2008_r2 is None:
-        from infi.registry import LocalComputer
-        key = LocalComputer().local_machine[r"SOFTWARE\Microsoft\Windows NT\CurrentVersion"]
-        value = key.values_store["CurrentVersion"].to_python_object()
-        MultipathClaim._windows_2008_r2 = value == u"6.1"
+        from infi.winver import Windows
+        MultipathClaim._windows_2008_r2 = Windows().is_windows_2008_r2()
     return MultipathClaim._windows_2008_r2
 
 class Windows2008R2Only(object):
