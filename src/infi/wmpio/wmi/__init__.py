@@ -9,7 +9,7 @@ def get_mulitpath_devices(wmi_client):
     devices = dict()
     for result in wmi_client.execute_query(DEVICES_QUERY):
         device = Device(result)
-    devices[device.InstanceName] = device
+        devices[device.InstanceName] = device
     return devices
 
 def get_load_balace_policies(wmi_client):

@@ -5,6 +5,10 @@ from . import MultipathClaim
 from contextlib import contextmanager, nested
 from infi.wmpio.mpclaim import MultipathClaim
 
+from . import CLEAR_POLICY, FAIL_OVER_ONLY, ROUND_ROBIN, ROUND_ROBIN_WITH_SUBSET
+from . import LEAST_QUEUE_DEPTH, WEIGHTED_PATHS, LEAST_BLOCKS
+from . import ACTIVE_OPTIMIZED, ACTIVE_NON_OPTIMIZED, STANDBY, UNAVAILABLE
+
 class MpclaimTestCase(unittest.TestCase):
     VENDOR_ID = "ABC"
     PRODUCT_ID = "123"
@@ -183,8 +187,7 @@ class MpclaimTestCase(unittest.TestCase):
         device, policy = self._get_sample_device_and_policy()
         MultipathClaim.set_device_specific_load_balancing_policy(device, policy)
         call_args = execute.call_args[0][0]
-        self.assertEqual(" ".join(call_args),
-                         "-l -d 123 1 0000000077030000 0 0 1 0000000077030001 1 0 0")
+        self.assertEqual(call_args, "-l -d 123 1 0000000077030000 0 0 1 0000000077030001 1 0 0".split())
 
     @mock.patch("infi.registry.LocalComputer")
     def test_get_claimed_hardware(self, LocalComputer):
@@ -200,3 +203,32 @@ class MpclaimTestCase(unittest.TestCase):
         is_windows_2008_r2.return_value = False
         self.assertRaises(NotImplementedError, MultipathClaim.get_default_load_balancing_policy)
 
+    @unittest.parameters.iterate("new_policy", [CLEAR_POLICY, FAIL_OVER_ONLY, ROUND_ROBIN, ROUND_ROBIN_WITH_SUBSET,
+                                            LEAST_QUEUE_DEPTH, WEIGHTED_PATHS, LEAST_BLOCKS])
+    def test_change_load_balancing_policy(self, new_policy):
+        from os import name
+        from . import is_windows_2008_r2
+        if name != "nt" or not is_windows_2008_r2():
+            raise unittest.SkipTest
+        from ..wmi import WmiClient, get_mulitpath_devices, get_load_balace_policies
+        client = WmiClient()
+        devices = get_mulitpath_devices(client)
+        policies = get_load_balace_policies(client)
+        key = devices.keys()[1]
+        device, policy = devices[key], policies[key]
+        policy.LoadBalancePolicy = new_policy
+        if new_policy == FAIL_OVER_ONLY or new_policy == ROUND_ROBIN_WITH_SUBSET:
+            for path in [path for path in device.PdoInformation][0:1]:
+                path.DeviceState = ACTIVE_OPTIMIZED
+            for path in [path for path in device.PdoInformation][1:]:
+                path.DeviceState = ACTIVE_NON_OPTIMIZED
+        if new_policy == WEIGHTED_PATHS:
+            for path in device.PdoInformation:
+                path.DeviceState = ACTIVE_OPTIMIZED
+            for path in policy.DSM_Paths:
+                path.PathWeight = 1
+        MultipathClaim.set_device_specific_load_balancing_policy(device, policy)
+
+from . import CLEAR_POLICY, FAIL_OVER_ONLY, ROUND_ROBIN, ROUND_ROBIN_WITH_SUBSET
+from . import LEAST_QUEUE_DEPTH, WEIGHTED_PATHS, LEAST_BLOCKS
+from . import ACTIVE_OPTIMIZED, ACTIVE_NON_OPTIMIZED, STANDBY, UNAVAILABLE

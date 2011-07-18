@@ -1,10 +1,10 @@
 
 def is_windows_2008_r2():
-    if MultipathClaim._windows_2008_r2:
+    if MultipathClaim._windows_2008_r2 is None:
         from infi.registry import LocalComputer
         key = LocalComputer().local_machine[r"SOFTWARE\Microsoft\Windows NT\CurrentVersion"]
-        value = key.values_store["CurrentVersion"]
-        MultipathClaim._windows_2008_r2 = value == "6.1"
+        value = key.values_store["CurrentVersion"].to_python_object()
+        MultipathClaim._windows_2008_r2 = value == u"6.1"
     return MultipathClaim._windows_2008_r2
 
 class Windows2008R2Only(object):
@@ -23,6 +23,11 @@ ROUND_ROBIN_WITH_SUBSET = 3
 LEAST_QUEUE_DEPTH = 4
 WEIGHTED_PATHS = 5
 LEAST_BLOCKS = 6
+
+ACTIVE_OPTIMIZED = 0
+ACTIVE_NON_OPTIMIZED = 1
+STANDBY = 2
+UNAVAILABLE = 3
 
 class MultipathClaim(object):
     """ wrapper to the mpclaim.exe utility
@@ -45,12 +50,13 @@ class MultipathClaim(object):
         if mpclaim's return value is non-zero, a RuntimeError exception is raised with stderr
         """
         from infi.execute import execute
+        from logging import debug
         arguments = [cls.path()]
         arguments.extend(commandline_arguments)
         process = execute(arguments)
         process.wait()
         if process.get_returncode() != 0:
-            raise RuntimeError(process.get_returncode(), process.get_stdout(), process.get_stderr())
+            raise RuntimeError(arguments, process.get_returncode(), process.get_stdout(), process.get_stderr())
         return process.get_stdout()
 
     @classmethod
@@ -188,10 +194,12 @@ class MultipathClaim(object):
         if policy in [CLEAR_POLICY, ROUND_ROBIN, LEAST_QUEUE_DEPTH, LEAST_BLOCKS]:
             cls.execute(["-l", "-d", str(disk_number), str(policy)])
         else:
-            paths_parameters = ["%s %s %s %s" % (hex(key)[2:].zfill(16),
-                                                 value["DeviceState"],
-                                                 value["PathWeight"],
-                                                 value["PreferredPath"]) for key, value in paths.items()]
+            paths_parameters = []
+            for key, value in paths.items():
+                paths_parameters.extend([hex(int(key))[2:].zfill(16),
+                                         str(value["DeviceState"]),
+                                         str(value["PathWeight"]),
+                                         str(value["PreferredPath"])])
             cls.execute(["-l", "-d", str(disk_number), str(policy)] + paths_parameters)
 
 
