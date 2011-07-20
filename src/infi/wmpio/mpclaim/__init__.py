@@ -5,6 +5,12 @@ def is_windows_2008_r2():
         MultipathClaim._windows_2008_r2 = Windows().is_windows_2008_r2()
     return MultipathClaim._windows_2008_r2
 
+def is_windows_2008():
+    if MultipathClaim._windows_2008 is None:
+        from infi.winver import Windows
+        MultipathClaim._windows_2008 = Windows().is_windows_2008()
+    return MultipathClaim._windows_2008
+
 class Windows2008R2Only(object):
     def __init__(self, func):
         self.func = func
@@ -43,7 +49,7 @@ class MultipathClaim(object):
         return join(environ.get("SystemRoot", join("C:", sep, "Windows")), "System32", "mpclaim.exe")
 
     @classmethod
-    def execute(cls, commandline_arguments):
+    def execute(cls, commandline_arguments, check_return_code=True):
         """ executes mpclaim.exe with the command-line arguments.
         if mpclaim's return value is non-zero, a RuntimeError exception is raised with stderr
         """
@@ -53,7 +59,7 @@ class MultipathClaim(object):
         arguments.extend(commandline_arguments)
         process = execute(arguments)
         process.wait()
-        if process.get_returncode() != 0:
+        if process.get_returncode() != 0 and check_return_code:
             raise RuntimeError(arguments, process.get_returncode(), process.get_stdout(), process.get_stderr())
         return process.get_stdout()
 
@@ -67,14 +73,14 @@ class MultipathClaim(object):
     def claim_specific_hardware(cls, vendor_id, product_id):
         """ tells mpio to claim a specific hardware
         """
-        cls.execute(["-n", "-i", "-d", '%s' % cls._get_hardware_id(vendor_id, product_id)])
+        cls.execute(["-n", "-i", "-d", '%s' % cls._get_hardware_id(vendor_id, product_id)], not is_windows_2008())
 
     @classmethod
     def claim_discovered_hardware(cls, spc3_only=False):
         """ tells mpio to claim disks of all attached hardware types
         if spc3_only is True, it has claim only disks that are spc3-complaint
         """
-        cls.execute(["-n", "-i", "-c" if spc3_only else "-a", ' '])
+        cls.execute(["-n", "-i", "-c" if spc3_only else "-a", ' '], not is_windows_2008())
 
     @classmethod
     def is_hardware_claimed(cls, vendor_id, product_id):
@@ -84,14 +90,13 @@ class MultipathClaim(object):
 
     @classmethod
     def unclaim_all_hardware(cls):
-        cls.execute(["-n", "-u", "-a", ' '])
+        cls.execute(["-n", "-u", "-a", ' '], not is_windows_2008())
 
     @classmethod
     def unclaim_specific_hardware(cls, vendor_id, product_id):
         if not cls.is_hardware_claimed(vendor_id, product_id):
             return #pragma: no-cover
-        cls.execute(["-n", "-u", "-d",
-                     '%s' % cls._get_hardware_id(vendor_id, product_id)])
+        cls.execute(["-n", "-u", "-d", '%s' % cls._get_hardware_id(vendor_id, product_id)], not is_windows_2008())
 
     @classmethod
     def get_claimed_hardware(cls):
