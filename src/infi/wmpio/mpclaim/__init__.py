@@ -39,6 +39,7 @@ class MultipathClaim(object):
     """
 
     _windows_2008_r2 = None
+    _windows_2008 = None
 
     @classmethod
     def path(cls):
