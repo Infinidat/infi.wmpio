@@ -185,6 +185,11 @@ class MultipathClaim(object):
         The LoadBalancePolicy attribute is taken from LoadBalancePolicy.LoadBalancePolicy
         The DeviceState attribute is taked for the paths in Device.PdoInformation
         The PreferredPath and PathWeight attribures are taken for the paths in LoadBalancePolicy.Dsm_Paths
+        
+        For clearing the explicit policy, or setting round-robin, least-queue-depth, least-blocks,
+        we ignore the state of the paths.
+        For setting round-robin-with-subset and weighted paths, we use the device states as they are now, and
+        override their TPG state.
         """
         assert device.InstanceName == load_balance_policy.InstanceName
         disk_number = device.DeviceName.split("MPIODisk")[-1]
