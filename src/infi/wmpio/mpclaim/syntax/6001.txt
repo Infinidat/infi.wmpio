@@ -1,0 +1,206 @@
+
+Invalid switch specified.
+
+Used for any of the following tasks:
+  - Display the hardware IDs of storage on the system.
+  - Have MSDSM claim/unclaim MPIO support for passed-in device(s).
+  - Display the current MPIO configuration.
+  - Display/Set the Load Balance policy for a specific device, for devices with
+    a specific hardware ID, or for all devices claimed by MSDSM.
+
+Display available/MSDSM-supported storage usage: mpclaim  query_switch
+ query_switch    Displays all storage that is of enterprise class (i.e.
+                 Fibre, iSCSI, SAS) or MSDSM's supported device list.
+       -e        Queries connected enterprise storage and displays as
+                 vendor-product id strings.
+       -h        Displays storages that MSDSM currently supports.
+
+(Un)Claim usage: mpclaim reboot_opt claim_switch device_switch device_hwid(s)
+ reboot_opt      Whether to automatically reboot or not
+       -r        automatically reboot (if needed) without prompting.
+       -n        Suppress reboot request (caller may need to reboot).
+ claim_switch    Whether to add or remove multipath support (through MSDSM's
+                 control).
+       -i        Add multipath support for device.
+       -u        Remove multipath support for device.
+ device_switch   Whether to apply above options to all or passed-in devices.
+       -d        Parameters following this switch indicate hardware IDs of
+                 devices.
+       -a        Work on all applicable devices.
+       -c        Work only on all SPC3-compliant devices (Meaningful only for
+                 claims. If used with '-u', it is treated as '-a'.)
+ device_hwid     HardwareIDs of Devices to be MPIO'd, as strings of
+                 vendor8product16, delimited by a space. (Use empty string
+                 with '-a' option.)
+
+Display Configuration usage: mpclaim config_option filename
+ config_option   Whether to display basic or verbose information.
+       -b        Display on top-level basic information.
+       -v        Display detailed information about current configuration.
+ filename        Configuration output file name.
+
+Display/Set LB Policy usage: mpclaim operation apply_to parameters
+ operation       Whether the policy settings should be set or shown.
+       -s        Shows the load balance setting.
+       -l        Sets the load balance setting.
+ apply_to        Whether the command applies to a specific device, devices with
+                 a specific Hardware ID, or devices claimed by MSDSM.
+       -d        Operation applies to a specific device.
+       -m        Operation applies to all devices controlled by MSDSM for
+                 which the policy has not already been explicitly set.
+       -t        Operation applies to all devices controlled by MSDSM with a
+                 matching hardware ID for which the policy has not been
+                 explicitly set.
+ parameters      If using the '-s' operation switch:
+                    The only meaningful paramter you can supply is an MPIO disk
+                    number when using the '-d' apply_to switch.  In this case,
+                    disk-specific information will be displayed.  If you do not
+                    supply a disk number, all MPIO disks will be displayed with
+                    some basic information about each.
+                    When viewing information for a particular disk, an asterisk
+                    preceding a displayed path indicates the preferred failback
+                    path when the load balance policy is Fail-Over Only.  An
+                    asterisk preceding a displayed TargetPortGroup indicates
+                    that it is the preferred TargetPortGroup.
+
+                 If using the '-l' operation switch:
+                    Valid load balance policy parameters are:
+                       0 = Clear the Policy
+                       1 = Fail-Over Only
+                       2 = Round Robin
+                       3 = Round Robin with Subset
+                       4 = Least Queue Depth
+                       5 = Weighted Paths
+                       6 = Least Blocks
+                       7 = Vendor-Specific
+
+                    With the '-t' apply_to switch, the paramter format is:
+
+                       HardwareID LBPolicy
+
+                       Hardware IDs can be obtained by using the '-e' switch as
+                       mentioned above.
+                       Policy can be any of the numbers above except for the
+                       Round Robin with Subset nor Weighted Paths policies as
+                       these require path-specific information to be set.
+                       However, if Round Robin is set, any disks that are ALUA-
+                       enabled will automatically have their policy set to
+                       Round Robin with Subset.
+
+                    With the '-m' apply_to switch, you simply need to specify
+                    the policy number from above.  Note that you cannot set the
+                    policy to Round Robin with Subset nor Weighted Paths as
+                    these require path-specific information to be set.
+                    However, if Round Robin is set, any disks that are ALUA-
+                    enabled will automatically have their policy set to Round
+                    Robin with Subset.
+
+                    With the '-d' apply_to switch, the basic format is:
+
+                       MPIODiskNumber LBPolicy
+
+                       Depending on the policy chosen, there may be additional
+                       parameters you need to specify.
+
+                       For Fail-Over Only, it is okay to specify only the
+                       Active/Optimized path. All other paths will be put in
+                       Active/Unoptimized or StandBy state, unless their path
+                       state is explicitly specified. In the case that the
+                       current policy is already Fail-Over Only, the current
+                       Active/Optimized path must be explicitly specified with
+                       a non-Active/Optimized state along with the pathId that
+                       needs to now be made Active/Optimized.  Format is:
+
+                          PathID State Weight Preferred
+
+                          State should be specified as follows:
+                             0 = Active/Optimized
+                             1 = Active/Unoptimized
+                             2 = Standby
+                             3 = Unavailable
+                          Weight is ignored for this policy.
+                          Preferred should be specified as follows:
+                             0 = False
+                             1 = True
+
+                       For Round Robin with Subset, it is okay to only specify
+                       the non-Active/Optimized paths. Paths not specified will
+                       be set to either Active/Optimized or their corresponding
+                       TargetPortGroup state.  Format is:
+
+                          PathID State Weight Preferred
+
+                          State should be specified as mentioned above.
+                          Weight is ignored for this policy.
+                          Preferred is ignored for this policy.
+
+                       For Weighted Paths, path states will be set to either
+                       Active/Optimized or the state of the corresponding
+                       TargetPortGroup and path weights will default to '0' for
+                       paths whose weights have never been explicitly set.
+                       Format is:
+
+                          PathID State Weight Preferred
+
+                          State should be specified as mentioned above.
+                          Weight must be specified as a positive integer.
+                          Preferred is ignored for this policy.
+
+                       For Least Queue Depth and Least Blocks, path states will
+                       be set to either Active/Optimized or the state of the
+                       corresponding TargetPortGroup.
+
+ For a given disk claimed by MSDSM, the load balance policy levels have the
+ following order of precendence:
+    1. The policy explicitly set for the disk. (Via '-l -d' or the MPIO control
+       panel applet.)
+    2. The policy set for the hardware ID of the disk.  (Via '-l -t'.)
+    3. The MSDSM-wide poilcy.  (Via '-l -m'.)
+    4. Round Robin if disk is non-ALUA, Round Robin with Subset otherwise.
+ Thus, if no policy is explicitly set for the disk itself, no policy is set for
+ the hardware ID of the disk, but the MSDSM-wide policy is set, the disk will
+ use the MSDSM-wide load balance policy.  However, if a policy is set for the
+ disk's hardware ID, that policy will be used regardless if the MSDSM-wide
+ policy is set or not.
+
+  Examples:
+    For setting 'MPIO Disk2' to Fail-Over Only with pathId 0000000077030000 set
+    to Active/Optimized and be the Preferred path for Failback:
+       mpclaim -l -d 2 1 0000000077030000 0 0 1
+
+    When Fail-Over Only is already set for 'MPIO Disk3' and pathId
+    0000000077030000 is set to Active/Optimized, to set pathId
+    0000000077030000 to Standby and pathId 0000000077030001 to
+    Active/Optimized:
+       mpclaim -l -d 3 1 0000000077030000 2 0 0 0000000077030001 0 0 0
+
+    For setting 'MPIO Disk1' to Round Robin with Subset with pathId
+    0000000077030000 to Active/Optimized and pathId 0000000077030001 set to
+    Standby state:
+       mpclaim -l -d 1 3 0000000077030000 0 0 0 0000000077030001 2 0 0
+
+    For setting 'MPIO Disk4' to Weighted Paths with pathId 0000000077030000 set
+    to Active/Optimized and path weight of 25:
+       mpclaim -l -d 4 5 0000000077030000 0 25 0
+
+    To clear the LUN-level load balance policy for 'MPIO Disk1':
+       mpclaim -l -d 1 0
+
+    To display detailed information for 'MPIO Disk5':
+       mpclaim -s -d 5
+
+    When viewing or setting load balance policies with the '-d' switch,
+    the MPIO disk number is used to address the disk. For a mapping of MPIO
+    disk numbers to system disk numbers, use:
+       mpclaim -s -d
+
+    To set the default load balance policy of all LUNs controlled by MSDSM to
+    Least Queue Depth:
+       mpclaim -l -m 4
+
+    To set the default load balance policy of all LUNs matching hardware ID
+    'VendorIdProductIdentifer' to Least Blocks:
+       mpclaim -l -t VendorIdProductIdentifer 6
+
+    To show the currently set target-wide load balance policies:
+       mpclaim -s -t
