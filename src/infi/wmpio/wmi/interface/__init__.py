@@ -47,7 +47,7 @@ class WmiClient(object):
         return results.ItemIndex(index)
 
     def execute_query(self, query):
-        from comtypes import COMError
+        from _ctypes import COMError
         results = self._client.ExecQuery(query)
         count = 0
         try:
