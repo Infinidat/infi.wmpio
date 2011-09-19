@@ -47,7 +47,13 @@ class WmiClient(object):
         return results.ItemIndex(index)
 
     def execute_query(self, query):
+        from comtypes import COMError
         results = self._client.ExecQuery(query)
-        for index in xrange(results.Count):
+        count = 0
+        try:
+            count = results.Count
+        except COMError:
+            pass
+        for index in xrange(count):
             yield self._get_item_by_index(results, index)
 
