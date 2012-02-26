@@ -1,6 +1,6 @@
 __import__("pkg_resources").declare_namespace(__name__)
 
-from .interface import WmiClient, WmiObject
+from infi.wmi import WmiClient, WmiObject
 from .model import Device, LoadBalancePolicy, DEVICES_QUERY, LBPOLICY_QUERY
 
 def get_multipath_devices(wmi_client):
