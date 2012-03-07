@@ -44,7 +44,7 @@ class PerformanceTestCase(TestCase):
         vbs = execute(['cscript', WALK_VBS] + ['2000', '1' if subtree else '0',
                                                '1' if read_all else '0'])
         end = clock()
-        print vbs.get_output()
+        print vbs.get_stdout()
         print vbs.get_stderr()
         self.assertEquals(vbs.get_returncode(), 0)
         self.assertNotEquals(vbs.get_stderr(), '', 'cscript returned an error')
