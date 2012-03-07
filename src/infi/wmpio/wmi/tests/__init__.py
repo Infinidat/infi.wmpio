@@ -47,7 +47,8 @@ class PerformanceTestCase(TestCase):
         print vbs.get_stdout()
         print vbs.get_stderr()
         self.assertEquals(vbs.get_returncode(), 0)
-        self.assertNotEquals(vbs.get_stderr(), '', 'cscript returned an error')
+        output = vbs.get_stderr() + vbs.get_stdout()
+        self.assertFalse(WALK_VBS in output, 'cscript returned an error')
         return end - start
 
     @unittest.parameters.iterate("count", [100, 500, 1000])
