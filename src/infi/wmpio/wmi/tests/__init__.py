@@ -43,8 +43,11 @@ class PerformanceTestCase(TestCase):
         start = clock()
         vbs = execute(['cscript', WALK_VBS] + ['2000', '1' if subtree else '0',
                                                '1' if read_all else '0'])
-        assert vbs.get_returncode() == 0
         end = clock()
+        print vbs.get_output()
+        print vbs.get_stderr()
+        self.assertEquals(vbs.get_returncode(), 0)
+        self.assertNotEquals(vbs.get_stderr(), '', 'cscript returned an error')
         return end - start
 
     @unittest.parameters.iterate("count", [100, 500, 1000])
