@@ -1,7 +1,13 @@
 __import__("pkg_resources").declare_namespace(__name__)
 
-from infi.wmi import WmiClient, WmiObject
+from infi.wmi import WmiObject
+from infi.wmi import WmiClient as WmiClient_
 from .model import Device, LoadBalancePolicy, DEVICES_QUERY, LBPOLICY_QUERY
+
+class WmiClient(WmiClient_):
+    def __init__(self):
+        super(WmiClient, self).__init__(r"root\wmi")
+
 
 def get_multipath_devices(wmi_client):
     """ returns a dictionary of (Device.InstanceName, Device) items
