@@ -218,7 +218,7 @@ class MpclaimTestCase(unittest.TestCase):
         client = WmiClient()
         devices = get_multipath_devices(client)
         policies = get_load_balace_policies(client)
-        key = devices.keys()[1]
+        key = devices.keys()[0]
         device, policy = devices[key], policies[key]
         policy.LoadBalancePolicy = new_policy
         if new_policy == FAIL_OVER_ONLY or new_policy == ROUND_ROBIN_WITH_SUBSET:
