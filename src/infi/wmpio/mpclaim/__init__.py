@@ -68,13 +68,14 @@ class MultipathClaim(object):
     def _get_hardware_id(cls, vendor_id, product_id):
         """ returns the concatination of vendor_id and product_id, both justed
         """
-        return ("%s%s" % (vendor_id.ljust(8), product_id.ljust(16))).strip()
+        return "%s%s" % (vendor_id.ljust(8), product_id.ljust(16))
 
     @classmethod
     def claim_specific_hardware(cls, vendor_id, product_id):
         """ tells mpio to claim a specific hardware
         """
-        cls.execute(["-n", "-i", "-d", '%s' % cls._get_hardware_id(vendor_id, product_id)], not is_windows_2008())
+        cls.execute(["-n", "-i", "-d", '%s' % cls._get_hardware_id(vendor_id, product_id).strip()], 
+                    not is_windows_2008())
 
     @classmethod
     def claim_discovered_hardware(cls, spc3_only=False):
@@ -97,7 +98,8 @@ class MultipathClaim(object):
     def unclaim_specific_hardware(cls, vendor_id, product_id):
         if not cls.is_hardware_claimed(vendor_id, product_id):
             return #pragma: no-cover
-        cls.execute(["-n", "-u", "-d", '%s' % cls._get_hardware_id(vendor_id, product_id)], not is_windows_2008())
+        cls.execute(["-n", "-u", "-d", '%s' % cls._get_hardware_id(vendor_id, product_id).strip()],
+                     not is_windows_2008())
 
     @classmethod
     def get_claimed_hardware(cls):
