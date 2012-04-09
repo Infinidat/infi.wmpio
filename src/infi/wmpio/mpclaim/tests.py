@@ -12,7 +12,7 @@ from . import ACTIVE_OPTIMIZED, ACTIVE_NON_OPTIMIZED, STANDBY, UNAVAILABLE
 class MpclaimTestCase(unittest.TestCase):
     VENDOR_ID = "ABC"
     PRODUCT_ID = "123"
-    HARDWARE_ID = VENDOR_ID.ljust(8) + PRODUCT_ID.ljust(16)
+    HARDWARE_ID = (VENDOR_ID.ljust(8) + PRODUCT_ID.ljust(16)).strip()
 
     def test_path(self):
         from os.path import join, sep
@@ -32,8 +32,8 @@ class MpclaimTestCase(unittest.TestCase):
 
     def test_hardware_id(self):
         self.assertEqual(MultipathClaim._get_hardware_id("NFINIDAT", "InfiniBox"),
-                         "NFINIDATInfiniBox       ")
-        self.assertEqual(MultipathClaim._get_hardware_id("", ""), " " * 24)
+                         "NFINIDATInfiniBox")
+        self.assertEqual(MultipathClaim._get_hardware_id("", ""), "")
 
     @mock.patch.object(MultipathClaim, "execute")
     def test_claim_specific_hardware(self, execute):
