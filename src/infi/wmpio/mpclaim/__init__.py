@@ -68,7 +68,7 @@ class MultipathClaim(object):
     def _get_hardware_id(cls, vendor_id, product_id):
         """ returns the concatination of vendor_id and product_id, both justed
         """
-        return "%s%s" % (vendor_id.ljust(8), product_id.ljust(16))
+        return ("%s%s" % (vendor_id.ljust(8), product_id.ljust(16))).strip()
 
     @classmethod
     def claim_specific_hardware(cls, vendor_id, product_id):
