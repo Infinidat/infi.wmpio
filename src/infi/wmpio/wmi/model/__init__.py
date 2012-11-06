@@ -2,6 +2,7 @@
 MPIO_WMI_NAMESPACE = r'root\wmi'
 DEVICES_QUERY = 'SELECT * FROM MPIO_GET_DESCRIPTOR'
 LBPOLICY_QUERY = 'SELECT * FROM DSM_QueryLBPolicy_V2'
+MSDSM_DEVICE_PERF_QUERY = 'SELECT * FROM MSDSM_DEVICE_PERF'
 
 from .. import WmiObject
 
@@ -149,3 +150,42 @@ class DSM_Path(WmiObject):
     @property
     def TargetPortGroup_State(self):
         return self.get_wmi_attribute("TargetPortGroup_State")
+
+class DevicePathPerformance(WmiObject):
+    @property
+    def PathId(self):
+        return int(self.get_wmi_attribute("PathId"))
+    
+    @property
+    def BytesRead(self):
+        return int(self.get_wmi_attribute("BytesRead"))
+
+    @property
+    def BytesWritten(self):
+        return int(self.get_wmi_attribute("BytesWritten"))
+    
+    @property
+    def NumberReads(self):
+        return int(self.get_wmi_attribute("NumberReads"))
+    
+    @property
+    def NumberWrites(self):
+        return int(self.get_wmi_attribute("NumberWrites"))
+
+class DevicePerformance(WmiObject):
+    @property
+    def InstanceName(self):
+        return self.get_wmi_attribute("InstanceName")
+
+    @property
+    def NumberPaths(self):
+        return self.get_wmi_attribute("NumberPaths")
+
+    @property
+    def PerfInfo(self):
+        items = self.get_wmi_attribute("PerfInfo")
+        paths = dict()
+        for item in items:
+            path_perf = DevicePathPerformance(item)
+            paths[path_perf.PathId] = path_perf
+        return paths
