@@ -9,5 +9,5 @@ With this module, you can:
 * query/add/remove claiming rules for the MSDSM
 """
 
-from .wmi import WmiClient, get_multipath_devices, get_load_balace_policies
+from .wmi import WmiClient, get_multipath_devices, get_load_balace_policies, get_device_performance
 from .mpclaim import MultipathClaim

@@ -2,7 +2,9 @@ __import__("pkg_resources").declare_namespace(__name__)
 
 from infi.wmi import WmiObject
 from infi.wmi import WmiClient as WmiClient_
-from .model import Device, LoadBalancePolicy, DEVICES_QUERY, LBPOLICY_QUERY
+from .model import Device, DEVICES_QUERY
+from .model import LoadBalancePolicy, LBPOLICY_QUERY
+from .model import DevicePerformance, MSDSM_DEVICE_PERF_QUERY
 
 class WmiClient(WmiClient_):
     def __init__(self):
@@ -17,6 +19,13 @@ def get_multipath_devices(wmi_client):
         device = Device(result)
         devices[device.InstanceName] = device
     return devices
+
+def get_device_performance(wmi_client):
+    device_performaces = dict()
+    for result in wmi_client.execute_query(MSDSM_DEVICE_PERF_QUERY):
+        device_performace = DevicePerformance(result)
+        device_performaces[device_performace.InstanceName] = device_performace
+    return device_performaces
 
 def get_load_balace_policies(wmi_client):
     """ returns a dictionary of (LoadBalanePolicy.InstanceName, LoadBalancePolicy)
