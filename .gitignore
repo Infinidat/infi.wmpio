@@ -41,3 +41,4 @@ src/infi/wmpio/__version__.py
 bootstrap.py
 .cache
 eggs
+parts
