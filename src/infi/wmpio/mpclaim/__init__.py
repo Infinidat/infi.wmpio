@@ -74,7 +74,7 @@ class MultipathClaim(object):
     def claim_specific_hardware(cls, vendor_id, product_id):
         """ tells mpio to claim a specific hardware
         """
-        cls.execute(["-n", "-i", "-d", '%s' % cls._get_hardware_id(vendor_id, product_id).strip()], 
+        cls.execute(["-n", "-i", "-d", '%s' % cls._get_hardware_id(vendor_id, product_id).strip()],
                     not is_windows_2008())
 
     @classmethod
@@ -162,7 +162,7 @@ class MultipathClaim(object):
 
     @classmethod
     @Windows2008R2Only
-    def get_hardware_specific_load_balacing_poicy(cls, vendor_id, product_id):
+    def get_hardware_specific_load_balancing_poicy(cls, vendor_id, product_id):
         """ gets MSDSM's explicit load balancing policy for a given hardware type
         if no such policy exists, CLEAR_POLICY is returns, and NOT the global-wise policy
         """
@@ -183,11 +183,11 @@ class MultipathClaim(object):
         """ sets an explicit load balancing policy for a given device
         this method accepts a Device and LoadBalancePolicy objects, and sets
         whatever policy and states that are defined in these objects.
-        
+
         The LoadBalancePolicy attribute is taken from LoadBalancePolicy.LoadBalancePolicy
         The DeviceState attribute is taked for the paths in Device.PdoInformation
         The PreferredPath and PathWeight attribures are taken for the paths in LoadBalancePolicy.Dsm_Paths
-        
+
         For clearing the explicit policy, or setting round-robin, least-queue-depth, least-blocks,
         we ignore the state of the paths.
         For setting round-robin-with-subset and weighted paths, we use the device states as they are now, and
