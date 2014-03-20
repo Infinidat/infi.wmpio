@@ -34,9 +34,7 @@ class ExeuctionTestCase(TestCase):
 
 class PerformanceTestCase(TestCase):
     def setUp(self):
-        from os import name
-        if name != 'nt':
-            raise unittest.SkipTest
+        raise unittest.SkipTest
 
     def _time_vbscript(self, subtree, read_all):
         assert exists(WALK_VBS)
