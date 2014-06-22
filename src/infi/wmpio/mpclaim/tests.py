@@ -39,7 +39,7 @@ class MpclaimTestCase(unittest.TestCase):
     def test_claim_specific_hardware(self, execute):
         MultipathClaim.claim_specific_hardware(self.VENDOR_ID, self.PRODUCT_ID)
         self.assertEqual(' '.join(execute.call_args[0][0]),
-                         ("-n -i -d %s" % self.HARDWARE_ID).strip())
+                         ("-n -i -d %s" % self.HARDWARE_ID))
 
     @mock.patch.object(MultipathClaim, "execute")
     def test_claim_all(self, execute):
@@ -72,7 +72,7 @@ class MpclaimTestCase(unittest.TestCase):
         is_hardware_claimed.return_value = True
         MultipathClaim.unclaim_specific_hardware(self.VENDOR_ID, self.PRODUCT_ID)
         self.assertEqual(' '.join(execute.call_args[0][0]),
-                         ("-n -u -d %s" % self.HARDWARE_ID).strip())
+                         ("-n -u -d %s" % self.HARDWARE_ID))
 
     @unittest.parameters.iterate("policy", [None, "Fail Over Only", "Round Robin",
                                             "Least Queue Depth", "Least Blocks"])
