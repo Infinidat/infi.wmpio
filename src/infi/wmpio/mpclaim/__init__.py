@@ -83,7 +83,7 @@ class MultipathClaim(object):
     def claim_specific_hardware(cls, vendor_id, product_id):
         """ tells mpio to claim a specific hardware
         """
-        cls.execute(["-n", "-i", "-d", '%s' % cls._get_hardware_id(vendor_id, product_id).strip()],
+        cls.execute(["-n", "-i", "-d", cls._get_hardware_id(vendor_id, product_id)],
                     not is_windows_2008())
 
     @classmethod
@@ -107,7 +107,7 @@ class MultipathClaim(object):
     def unclaim_specific_hardware(cls, vendor_id, product_id):
         if not cls.is_hardware_claimed(vendor_id, product_id):
             return #pragma: no-cover
-        cls.execute(["-n", "-u", "-d", '%s' % cls._get_hardware_id(vendor_id, product_id).strip()],
+        cls.execute(["-n", "-u", "-d", cls._get_hardware_id(vendor_id, product_id)],
                      not is_windows_2008())
 
     @classmethod
@@ -120,7 +120,7 @@ class MultipathClaim(object):
         registry = LocalComputer(KEY_READ | KEY_ENUMERATE_SUB_KEYS | KEY_QUERY_VALUE)
         mpdev = registry.local_machine[r'SYSTEM\CurrentControlSet\Control\MPDEV']
         devices_list = mpdev.values_store['MPIOSupportedDeviceList'].to_python_object()
-        return [dict(vendor_id=device[:8].strip(), product_id=device[8:].strip()) for device in devices_list]
+        return [dict(vendor_id=device[:8], product_id=device[8:]) for device in devices_list]
 
     @classmethod
     def _extract_load_balancing_from_output(cls, output):
