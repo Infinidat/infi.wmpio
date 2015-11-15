@@ -80,9 +80,24 @@ class MultipathClaim(object):
         return "%s%s" % (vendor_id.ljust(8), product_id.ljust(16))
 
     @classmethod
+    def _create_mpdev_key_if_missing(cls):
+        from infi.registry import LocalComputer, RegistryValueFactory
+        from infi.registry.constants import KEY_READ, KEY_WRITE, KEY_ENUMERATE_SUB_KEYS, KEY_QUERY_VALUE, REG_MULTI_SZ
+
+        MPDEV_KEY_PATH = r'SYSTEM\CurrentControlSet\Control\MPDEV'
+
+        registry = LocalComputer(KEY_READ | KEY_WRITE | KEY_ENUMERATE_SUB_KEYS | KEY_QUERY_VALUE)
+        if registry.local_machine.get(MPDEV_KEY_PATH) is None:
+            registry.local_machine[MPDEV_KEY_PATH] = ''
+        if registry.local_machine[MPDEV_KEY_PATH].values_store.get('MPIOSupportedDeviceList') is None:
+            mpdev_key = registry.local_machine[MPDEV_KEY_PATH]
+            mpdev_key.values_store['MPIOSupportedDeviceList'] = RegistryValueFactory().by_type(REG_MULTI_SZ)([''])
+
+    @classmethod
     def claim_specific_hardware(cls, vendor_id, product_id):
         """ tells mpio to claim a specific hardware
         """
+        cls._create_mpdev_key_if_missing()
         cls.execute(["-n", "-i", "-d", cls._get_hardware_id(vendor_id, product_id)],
                     not is_windows_2008())
 
@@ -118,8 +133,11 @@ class MultipathClaim(object):
         from infi.registry.constants import KEY_READ, KEY_ENUMERATE_SUB_KEYS, KEY_QUERY_VALUE
 
         registry = LocalComputer(KEY_READ | KEY_ENUMERATE_SUB_KEYS | KEY_QUERY_VALUE)
-        mpdev = registry.local_machine[r'SYSTEM\CurrentControlSet\Control\MPDEV']
-        devices_list = mpdev.values_store['MPIOSupportedDeviceList'].to_python_object()
+        try:
+            mpdev = registry.local_machine[r'SYSTEM\CurrentControlSet\Control\MPDEV']
+            devices_list = mpdev.values_store['MPIOSupportedDeviceList'].to_python_object()
+        except KeyError:
+            devices_list = []
         return [dict(vendor_id=device[:8], product_id=device[8:]) for device in devices_list]
 
     @classmethod
