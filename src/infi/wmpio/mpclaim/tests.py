@@ -35,8 +35,9 @@ class MpclaimTestCase(unittest.TestCase):
                          "NFINIDATInfiniBox       ")
         self.assertEqual(MultipathClaim._get_hardware_id("", ""), " "*24)
 
+    @mock.patch.object(MultipathClaim, "_create_mpdev_key_if_missing")
     @mock.patch.object(MultipathClaim, "execute")
-    def test_claim_specific_hardware(self, execute):
+    def test_claim_specific_hardware(self, execute, _create_mpdev_key_if_missing):
         MultipathClaim.claim_specific_hardware(self.VENDOR_ID, self.PRODUCT_ID)
         self.assertEqual(' '.join(execute.call_args[0][0]),
                          ("-n -i -d %s" % self.HARDWARE_ID))
