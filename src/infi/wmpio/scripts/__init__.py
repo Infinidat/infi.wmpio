@@ -1,3 +1,4 @@
+from __future__ import print_function
 __import__("pkg_resources").declare_namespace(__name__)
 
 from sys import argv
@@ -34,7 +35,7 @@ def walk_on_policies(wmi_client, walk_on_paths, read_all_attributes):
 
 def walk(count, subtree, read_all):
     wmi_client = WmiClient()
-    for _ in xrange(int(count)):
+    for _ in range(int(count)):
         walk_on_devices(wmi_client, subtree, read_all)
         walk_on_policies(wmi_client, subtree, read_all)
 
@@ -44,13 +45,13 @@ def travel(argv=argv):
     start_time = clock()
     walk(int(count), int(subtree), int(read_all))
     duration = clock() - start_time
-    print("time=%.2f, iters=%d, iters/sec: %.2f" %
-          (duration, int(count), float(count) / duration))
+    print(("time=%.2f, iters=%d, iters/sec: %.2f" %
+          (duration, int(count), float(count) / duration)))
 
 def profile(argv=argv):
     from cProfile import run
     count, subtree, read_all = argv[1:]
     filename = '.'.join(argv)
-    print filename
+    print(filename)
     run("from infi.wmpio.scripts import walk; walk(%s, %s, %s)" % \
         (int(count), int(subtree), int(read_all)), filename)
