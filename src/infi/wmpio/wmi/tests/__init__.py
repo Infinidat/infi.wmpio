@@ -1,3 +1,4 @@
+from __future__ import print_function
 
 from contextlib import contextmanager, nested
 from time import clock
@@ -42,9 +43,9 @@ class PerformanceTestCase(TestCase):
         vbs = execute(['cscript', WALK_VBS] + ['2000', '1' if subtree else '0',
                                                '1' if read_all else '0'])
         end = clock()
-        print vbs.get_stdout()
-        print vbs.get_stderr()
-        self.assertEquals(vbs.get_returncode(), 0)
+        print(vbs.get_stdout())
+        print(vbs.get_stderr())
+        self.assertEqual(vbs.get_returncode(), 0)
         output = vbs.get_stderr() + vbs.get_stdout()
         self.assertFalse(WALK_VBS in output, 'cscript returned an error')
         return end - start
