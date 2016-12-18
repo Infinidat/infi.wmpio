@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from contextlib import contextmanager, nested
+from contextlib import contextmanager
 from time import clock
 from ...scripts import walk
 from infi import unittest

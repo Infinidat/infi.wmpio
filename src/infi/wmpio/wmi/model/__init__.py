@@ -3,6 +3,7 @@ MPIO_WMI_NAMESPACE = r'root\wmi'
 DEVICES_QUERY = 'SELECT * FROM MPIO_GET_DESCRIPTOR'
 LBPOLICY_QUERY = 'SELECT * FROM DSM_QueryLBPolicy_V2'
 MSDSM_DEVICE_PERF_QUERY = 'SELECT * FROM MSDSM_DEVICE_PERF'
+DEVICE_PERFORMANCE_QUERY = 'SELECT * FROM MPIO_DEVINSTANCE_HEALTH_INFO'
 
 from .. import WmiObject
 
@@ -155,19 +156,19 @@ class DevicePathPerformance(WmiObject):
     @property
     def PathId(self):
         return int(self.get_wmi_attribute("PathId"))
-    
+
     @property
     def BytesRead(self):
-        return int(self.get_wmi_attribute("BytesRead"))
+        return int(self.get_wmi_attribute("NumberBytesRead"))
 
     @property
     def BytesWritten(self):
-        return int(self.get_wmi_attribute("BytesWritten"))
-    
+        return int(self.get_wmi_attribute("NumberBytesWritten"))
+
     @property
     def NumberReads(self):
         return int(self.get_wmi_attribute("NumberReads"))
-    
+
     @property
     def NumberWrites(self):
         return int(self.get_wmi_attribute("NumberWrites"))
@@ -179,11 +180,11 @@ class DevicePerformance(WmiObject):
 
     @property
     def NumberPaths(self):
-        return self.get_wmi_attribute("NumberPaths")
+        return self.get_wmi_attribute("NumberDevInstancePackets")
 
     @property
     def PerfInfo(self):
-        items = self.get_wmi_attribute("PerfInfo")
+        items = self.get_wmi_attribute("DevInstanceHealthPackets")
         paths = dict()
         for item in items:
             path_perf = DevicePathPerformance(item)

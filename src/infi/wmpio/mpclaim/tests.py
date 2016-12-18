@@ -2,7 +2,7 @@ from infi import unittest
 import mock
 
 from . import MultipathClaim
-from contextlib import contextmanager, nested
+from contextlib import contextmanager
 from infi.wmpio.mpclaim import MultipathClaim
 
 from . import CLEAR_POLICY, FAIL_OVER_ONLY, ROUND_ROBIN, ROUND_ROBIN_WITH_SUBSET
