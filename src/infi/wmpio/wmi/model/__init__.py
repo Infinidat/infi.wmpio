@@ -28,7 +28,7 @@ class Device(WmiObject):
                 yield path
         else:
             items = self.get_wmi_attribute("PdoInformation")
-            if items:
+            if not items:
                 return
             for item in items:
                 path = PdoInformation(item)
