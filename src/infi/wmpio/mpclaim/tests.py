@@ -107,9 +107,8 @@ class MpclaimTestCase(unittest.TestCase):
             self.assertIn(MultipathClaim._extract_hardware_specific_load_balacing_policy(output, self.HARDWARE_ID),
                           [ROUND_ROBIN, FAIL_OVER_ONLY, LEAST_BLOCKS, LEAST_QUEUE_DEPTH])
 
-    @mock.patch("infi.wmpio.mpclaim.is_windows_2008_r2")
     @mock.patch.object(MultipathClaim, "execute")
-    def test_get_default_load_balancing_policy(self, execute, is_windows_2008_r2):
+    def test_get_default_load_balancing_policy(self, execute):
         raise unittest.SkipTest
         from . import ROUND_ROBIN
         output = "\n".join(["", "MSDSM-wide Load Balance Policy: Round Robin", ""])
@@ -117,17 +116,15 @@ class MpclaimTestCase(unittest.TestCase):
         self.assertEqual(MultipathClaim.get_default_load_balancing_policy(), ROUND_ROBIN)
         self.assertEqual(" ".join(execute.call_args[0][0]), "-s -m")
 
-    @mock.patch("infi.wmpio.mpclaim.is_windows_2008_r2")
     @mock.patch.object(MultipathClaim, "execute")
-    def test_set_default_load_balancing_policy(self, execute, is_windows_2008_r2):
+    def test_set_default_load_balancing_policy(self, execute):
         raise unittest.SkipTest
         from . import ROUND_ROBIN
         MultipathClaim.set_default_load_balancing_policy(ROUND_ROBIN)
         self.assertEqual(" ".join(execute.call_args[0][0]), "-l -m %s" % ROUND_ROBIN)
 
-    @mock.patch("infi.wmpio.mpclaim.is_windows_2008_r2")
     @mock.patch.object(MultipathClaim, "execute")
-    def test_get_hardware_specific_load_balancing_policy(self, execute, is_windows_2008_r2):
+    def test_get_hardware_specific_load_balancing_policy(self, execute):
         raise unittest.SkipTest
         from . import ROUND_ROBIN
         output = "\n".join(["",
@@ -140,9 +137,8 @@ class MpclaimTestCase(unittest.TestCase):
         self.assertEqual(MultipathClaim.get_hardware_specific_load_balancing_poicy(*args), ROUND_ROBIN)
         self.assertEqual(" ".join(execute.call_args[0][0]), "-s -t")
 
-    @mock.patch("infi.wmpio.mpclaim.is_windows_2008_r2")
     @mock.patch.object(MultipathClaim, "execute")
-    def test_set_hardware_specific_load_balancing_policy(self, execute, is_windows_2008_r2):
+    def test_set_hardware_specific_load_balancing_policy(self, execute):
         raise unittest.SkipTest
         from . import ROUND_ROBIN
         MultipathClaim.set_hardware_specific_load_balancing_policy(self.VENDOR_ID, self.PRODUCT_ID, ROUND_ROBIN)
@@ -174,9 +170,8 @@ class MpclaimTestCase(unittest.TestCase):
 
         return device, policy
 
-    @mock.patch("infi.wmpio.mpclaim.is_windows_2008_r2")
     @mock.patch.object(MultipathClaim, "execute")
-    def test_set_device_specific_load_balancing_policy__simple(self, execute, is_windows_2008_r2):
+    def test_set_device_specific_load_balancing_policy__simple(self, execute):
         raise unittest.SkipTest
         from . import ROUND_ROBIN
         device, policy = self._get_sample_device_and_policy()
@@ -186,9 +181,8 @@ class MpclaimTestCase(unittest.TestCase):
         self.assertEqual(" ".join(call_args),
                          "-l -d 123 2")
 
-    @mock.patch("infi.wmpio.mpclaim.is_windows_2008_r2")
     @mock.patch.object(MultipathClaim, "execute")
-    def test_set_device_specific_load_balancing_policy__complex(self, execute, is_windows_2008_r2):
+    def test_set_device_specific_load_balancing_policy__complex(self, execute):
         raise unittest.SkipTest
         from . import ROUND_ROBIN
         device, policy = self._get_sample_device_and_policy()
@@ -208,12 +202,6 @@ class MpclaimTestCase(unittest.TestCase):
         LocalComputer.return_value.local_machine = \
             {"SYSTEM\\CurrentControlSet\\Control\\MPDEV":mock}
         MultipathClaim.get_claimed_hardware()
-
-    @mock.patch("infi.wmpio.mpclaim.is_windows_2008_r2")
-    def test_windows_2008_r2_command_on_other_version(self, is_windows_2008_r2):
-        raise unittest.SkipTest
-        is_windows_2008_r2.return_value = False
-        self.assertRaises(NotImplementedError, MultipathClaim.get_default_load_balancing_policy)
 
     @unittest.parameters.iterate("new_policy", [CLEAR_POLICY, FAIL_OVER_ONLY, ROUND_ROBIN, ROUND_ROBIN_WITH_SUBSET,
                                             LEAST_QUEUE_DEPTH, WEIGHTED_PATHS, LEAST_BLOCKS])

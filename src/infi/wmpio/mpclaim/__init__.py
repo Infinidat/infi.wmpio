@@ -1,33 +1,10 @@
 
-def is_windows_2008_r2():
-    if MultipathClaim._windows_2008_r2 is None:
-        from infi.winver import Windows
-        MultipathClaim._windows_2008_r2 = Windows().is_windows_2008_r2()
-    return MultipathClaim._windows_2008_r2
-
 def is_windows_2008():
     if MultipathClaim._windows_2008 is None:
         from infi.winver import Windows
         MultipathClaim._windows_2008 = Windows().is_windows_2008()
     return MultipathClaim._windows_2008
 
-class Windows2008R2Only(object):
-    def __init__(self, func):
-        self.func = func
-
-    def __call__(self, *args, **kwargs):
-        if not is_windows_2008_r2():
-            raise NotImplementedError()
-        return self.func(*args, **kwargs)
-
-class Windows2008Only(object):
-    def __init__(self, func):
-        self.func = func
-
-    def __call__(self, *args, **kwargs):
-        if not is_windows_2008():
-            raise NotImplementedError()
-        return self.func(*args, **kwargs)
 
 CLEAR_POLICY = 0
 FAIL_OVER_ONLY = 1
@@ -173,7 +150,6 @@ class MultipathClaim(object):
             return LEAST_BLOCKS
 
     @classmethod
-    @Windows2008Only
     def get_default_load_balancing_policy(cls):
         """ returns MSDSM's default load balancing policy
         """
@@ -181,14 +157,12 @@ class MultipathClaim(object):
         return cls._extract_load_balancing_from_output(output)
 
     @classmethod
-    @Windows2008Only
     def set_default_load_balancing_policy(cls, policy):
         """ sets MSDSM's default load balancing policy
         """
         cls.execute(["-l", "-m", str(policy)])
 
     @classmethod
-    @Windows2008Only
     def get_hardware_specific_load_balancing_poicy(cls, vendor_id, product_id):
         """ gets MSDSM's explicit load balancing policy for a given hardware type
         if no such policy exists, CLEAR_POLICY is returns, and NOT the global-wise policy
@@ -198,14 +172,12 @@ class MultipathClaim(object):
         return cls._extract_hardware_specific_load_balacing_policy(output, hardware_id)
 
     @classmethod
-    @Windows2008Only
     def set_hardware_specific_load_balancing_policy(cls, vendor_id, product_id, policy):
         """ sets a load balancing policy explicitly for a given hardware type
         """
         cls.execute(["-l", "-t", cls._get_hardware_id(vendor_id, product_id), str(policy)])
 
     @classmethod
-    @Windows2008Only
     def set_device_specific_load_balancing_policy(cls, device, load_balance_policy):
         """ sets an explicit load balancing policy for a given device
         this method accepts a Device and LoadBalancePolicy objects, and sets
