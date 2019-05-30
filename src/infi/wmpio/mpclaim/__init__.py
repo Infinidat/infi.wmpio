@@ -163,7 +163,7 @@ class MultipathClaim(object):
         cls.execute(["-l", "-m", str(policy)])
 
     @classmethod
-    def get_hardware_specific_load_balancing_poicy(cls, vendor_id, product_id):
+    def get_hardware_specific_load_balancing_policy(cls, vendor_id, product_id):
         """ gets MSDSM's explicit load balancing policy for a given hardware type
         if no such policy exists, CLEAR_POLICY is returns, and NOT the global-wise policy
         """
