@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 
 def is_windows_2008():
     if MultipathClaim._windows_2008 is None:
@@ -41,13 +44,14 @@ class MultipathClaim(object):
         if mpclaim's return value is non-zero, a RuntimeError exception is raised with stderr
         """
         from infi.execute import execute
-        from logging import debug
         arguments = [cls.path()]
         arguments.extend(commandline_arguments)
+        logger.debug("Executing {}...".format(arguments))
         process = execute(arguments)
         process.wait()
         if process.get_returncode() != 0 and check_return_code:
             raise RuntimeError(arguments, process.get_returncode(), process.get_stdout(), process.get_stderr())
+        logger.debug("Result: {}...".format(process.get_stdout()))
         return process.get_stdout()
 
     @classmethod
