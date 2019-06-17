@@ -134,7 +134,7 @@ class MpclaimTestCase(unittest.TestCase):
                             ""])
         execute.return_value = output
         args = (self.VENDOR_ID, self.PRODUCT_ID)
-        self.assertEqual(MultipathClaim.get_hardware_specific_load_balancing_poicy(*args), ROUND_ROBIN)
+        self.assertEqual(MultipathClaim.get_hardware_specific_load_balancing_policy(*args), ROUND_ROBIN)
         self.assertEqual(" ".join(execute.call_args[0][0]), "-s -t")
 
     @mock.patch.object(MultipathClaim, "execute")
