@@ -123,22 +123,22 @@ class MultipathClaim(object):
 
     @classmethod
     def _extract_load_balancing_from_output(cls, output):
-        if "MSDSM-wide Load Balance Policy: Fail Over Only" in output:
+        if "MSDSM-wide Load Balance Policy: Fail Over Only" in output.decode():
             return FAIL_OVER_ONLY
-        if "MSDSM-wide Load Balance Policy: Round Robin" in output:
+        if "MSDSM-wide Load Balance Policy: Round Robin" in output.decode():
             return ROUND_ROBIN
-        if "MSDSM-wide Load Balance Policy: Least Queue Depth" in output:
+        if "MSDSM-wide Load Balance Policy: Least Queue Depth" in output.decode():
             return LEAST_QUEUE_DEPTH
-        if "MSDSM-wide Load Balance Policy: Least Blocks" in output:
+        if "MSDSM-wide Load Balance Policy: Least Blocks" in output.decode():
             return LEAST_BLOCKS
         return CLEAR_POLICY
 
     @classmethod
     def _extract_hardware_specific_load_balacing_policy(cls, output, hardware_id):
-        if hardware_id not in output:
+        if hardware_id not in output.decode():
             return CLEAR_POLICY
 
-        for line in output.splitlines():
+        for line in output.decode().splitlines():
             if hardware_id not in line:
                 continue
             break
